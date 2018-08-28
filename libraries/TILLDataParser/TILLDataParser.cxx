@@ -1,0 +1,78 @@
+#include "TILLDataParser.h"
+#include "TILLDataParserException.h"
+
+#include "TChannel.h"
+#include "Globals.h"
+
+#include "TScalerQueue.h"
+
+#include "TEpicsFrag.h"
+#include "TParsingDiagnostics.h"
+
+#include "Rtypes.h"
+
+#include "TFragment.h"
+#include "TBadFragment.h"
+
+TILLDataParser::TILLDataParser()
+   : TDataParser()
+{
+	fState = EDataParserState::kGood;
+}
+
+TILLDataParser::~TILLDataParser()
+{
+}
+
+int TILLDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
+{
+   /// Process this TLstEvent using the provided data parser.
+   /// Returns the total number of fragments read (good and bad).
+   // right now the parser only returns the total number of fragments read
+   // so we assume (for now) that all fragments are good fragments
+	std::shared_ptr<TLstEvent> event = std::static_pointer_cast<TLstEvent>(rawEvent);
+   return FippsToFragment(event->GetData(), event->GetDataSize());
+}
+
+int TILLDataParser::FippsToFragment(char* data, uint32_t size)
+{
+   uint32_t* ptr = reinterpret_cast<uint32_t*>(data);
+
+   int                        totalEventsRead = 0;
+   std::shared_ptr<TFragment> eventFrag       = std::make_shared<TFragment>();
+   Long64_t                   tmpTimestamp;
+   if(fItemsPopped != nullptr && fInputSize != nullptr) {
+      *fItemsPopped = 0;
+      *fInputSize   = size/16; //4 words of 4 bytes for each event
+   }
+
+	// we read 4 words for each event, and size is in bytes, so we need to divide it by 4 (size of uint32_t)
+   for(size_t i = 0; i + 3 < size / 4; i += 4) {
+      if(fItemsPopped != nullptr && fInputSize != nullptr) {
+         ++(*fItemsPopped);
+         --(*fInputSize);
+      }
+      eventFrag->SetAddress(ptr[i] >> 16);
+      tmpTimestamp = ptr[i] & 0xffff;
+      tmpTimestamp = tmpTimestamp<<30;
+      tmpTimestamp |= ptr[i + 1] & 0x3fffffff;
+      eventFrag->SetTimeStamp(tmpTimestamp);
+      ++totalEventsRead;
+      if((ptr[i + 2] & 0x7fff) == 0) {
+         if(fRecordDiag) {
+            TParsingDiagnostics::Get()->BadFragment(99);
+         }
+         // Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, ptr, size / 4, i + 2, false));
+         continue;
+      }
+      eventFrag->SetCharge(static_cast<int32_t>(ptr[i + 2] & 0x7fff));
+      if(fRecordDiag) {
+         TParsingDiagnostics::Get()->GoodFragment(eventFrag);
+      }
+      Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
+      // std::cout<<totalEventsRead<<": "<<eventFrag->Charge()<<", "<<eventFrag->GetTimeStamp()<<std::endl;
+   }
+
+   return totalEventsRead;
+}
+
