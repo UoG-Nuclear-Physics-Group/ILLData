@@ -18,7 +18,9 @@
 #include "TLstFile.h"
 #include "TLstEvent.h"
 #include "TRunInfo.h"
-#include "GVersion.h"
+#include "TILLDetectorInformation.h"
+#include "TILLMnemonic.h"
+#include "ILLDataVersion.h"
 
 /// \cond CLASSIMP
 ClassImp(TLstFile)
@@ -102,11 +104,17 @@ bool TLstFile::Open(const char* filename)
 #define O_LARGEFILE 0
 #endif
 
+	// setup TChannel to use our mnemonics
+	TChannel::SetMnemonicClass(TILLMnemonic::Class());
+
    TRunInfo::SetRunInfo(GetRunNumber(), GetSubRunNumber());
 	TRunInfo::ClearVersion();
-   TRunInfo::SetVersion(GRSI_RELEASE);
+   TRunInfo::SetVersion(ILLDATA_RELEASE);
 
    std::cout<<"Successfully read "<<fFileSize - headerSize<<" bytes into buffer!"<<std::endl;
+
+	TILLDetectorInformation* detInfo = new TILLDetectorInformation();
+	TRunInfo::SetDetectorInformation(detInfo);
 
    return true;
 }
