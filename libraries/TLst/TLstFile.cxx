@@ -18,6 +18,7 @@
 #include "TLstFile.h"
 #include "TLstEvent.h"
 #include "TRunInfo.h"
+#include "TILLDetectorInformation.h"
 #include "GVersion.h"
 
 /// \cond CLASSIMP
@@ -107,6 +108,9 @@ bool TLstFile::Open(const char* filename)
    TRunInfo::SetVersion(GRSI_RELEASE);
 
    std::cout<<"Successfully read "<<fFileSize - headerSize<<" bytes into buffer!"<<std::endl;
+
+	TILLDetectorInformation* detInfo = new TILLDetectorInformation();
+	TRunInfo::SetDetectorInformation(detInfo);
 
    return true;
 }
