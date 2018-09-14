@@ -13,7 +13,7 @@
 #include "TFragment.h"
 #include "TChannel.h"
 
-class TFippsHit : public TDetectorHit {
+class TFippsHit : public TILLDetectorHit {
 public:
    TFippsHit();
    TFippsHit(const TFippsHit&);
@@ -28,6 +28,7 @@ public:
 
    /////////////////////////		/////////////////////////////////////
 
+   inline UShort_t GetArrayNumber() const override { return (4 * (GetDetector() - 1) + (GetCrystal() + 1)); } //!<!
    static bool CompareEnergy(const TFippsHit*, const TFippsHit*); //!<!
    void        Add(const TDetectorHit*) override;             //!<!
 
