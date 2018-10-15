@@ -12,6 +12,7 @@
 
 #include "TFragment.h"
 #include "TChannel.h"
+#include "TILLDetectorHit.h"
 
 class TFippsHit : public TILLDetectorHit {
 public:
