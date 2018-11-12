@@ -92,7 +92,6 @@ bool TLstFile::Open(const char* filename)
       in.seekg(headerSize, std::ifstream::beg);
       in.read(fReadBuffer.data(), fFileSize);
       in.close();
-
    } catch(std::exception& e) {
       std::cout<<"Caught "<<e.what()<<std::endl;
    }
@@ -140,6 +139,12 @@ int TLstFile::Read(std::shared_ptr<TRawEvent> lstEvent)
       return fFileSize;
    }
    return 0;
+}
+
+void TLstFile::Skip(size_t)
+{
+	std::cerr<<"Sorry, but we can't skip events in an LST file, the whole file is treated as a single event!"<<std::endl;
+	return;
 }
 
 int TLstFile::GetRunNumber()
