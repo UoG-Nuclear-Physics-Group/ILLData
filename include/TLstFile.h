@@ -43,6 +43,7 @@ public:
 #ifndef __CINT__
    int Read(std::shared_ptr<TRawEvent> lstEvent) override; ///< Read one event from the file
 #endif
+	void Skip(size_t nofEvents) override; ///< Skip nofEvents from the file
    std::string Status(bool long_file_description = true) override;
 
    int GetRunNumber() override;
