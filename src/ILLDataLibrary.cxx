@@ -1,5 +1,7 @@
 #include <string>
 
+#include "TClassRef.h"
+
 #include "TLstFile.h"
 #include "TILLDataParser.h"
 #include "ILLDataVersion.h"
@@ -14,4 +16,4 @@ extern "C" void DestroyParser(TILLDataParser* obj) { delete obj; }
 
 extern "C" std::string LibraryVersion() { return std::string(ILLDATA_RELEASE); }
 
-extern "C" void InitLibrary() { TChannel::SetMnemonicClass(TILLMnemonic::Class()); }
+extern "C" void InitLibrary() { TChannel::SetMnemonicClass(TClassRef("TILLMnemonic")); }
