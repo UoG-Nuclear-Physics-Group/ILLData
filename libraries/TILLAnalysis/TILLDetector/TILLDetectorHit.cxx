@@ -46,8 +46,8 @@ Double_t TILLDetectorHit::GetTime(const ETimeFlag&, Option_t*) const
    TChannel* channel = GetChannel();
    if(channel == nullptr) {
       Error("GetTime", "No TChannel exists for address 0x%08x", GetAddress());
-      return SetTime(10. * (static_cast<Double_t>((GetTimeStamp()) + gRandom->Uniform())));
+      return SetTime(static_cast<Double_t>((GetTimeStamp()) + gRandom->Uniform()) * GetTimeStampUnit());
    }
-	Double_t dTime = static_cast<Double_t>((GetTimeStamp()) + gRandom->Uniform());
-	return SetTime(10. * (dTime - channel->GetTZero(GetEnergy())));
+	Double_t dTime = static_cast<Double_t>((GetTimeStamp()) + gRandom->Uniform()) * GetTimeStampUnit();
+	return SetTime(dTime - channel->GetTZero(GetEnergy()));
 }
