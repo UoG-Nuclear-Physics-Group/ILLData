@@ -24,19 +24,21 @@ void TILLMnemonic::EnumerateSystem()
    }
 }
 
-void TILLMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType)
+void TILLMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType, TPriorityValue<int>& timeStampUnit)
 {
 	std::string name = digitizerName.Value();
 	std::transform(name.begin(), name.end(), name.begin(), ::toupper);
 	EDigitizer tmpType = EDigitizer::kDefault;
+	int tmpUnit = 10;
 	if(name.compare("CAEN8") == 0) {
 		tmpType = EDigitizer::kCAEN8;
 	} else if(name.compare("CAEN") == 0) {
 		tmpType = EDigitizer::kCaen;
 	} else {
-		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'GRF16', 'GRF4G', 'TIG10', 'TIG64', and 'CAEN'!"<<std::endl;
+		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'CAEN8', and 'CAEN'!"<<std::endl;
 	}
 	digitizerType.Set(tmpType, digitizerName.Priority());
+	timeStampUnit.Set(tmpUnit, digitizerName.Priority());
 }
 
 void TILLMnemonic::Parse(std::string* name)
