@@ -26,7 +26,7 @@
 
 #include "TLstEvent.h"
 
-/// Reader for MIDAS .mid files
+/// Reader for ILL .lst files
 
 class TLstFile : public TRawFile {
 public:
@@ -52,6 +52,12 @@ public:
 #ifndef __CINT__
    std::shared_ptr<TRawEvent> NewEvent() override { return std::make_shared<TLstEvent>(); }
 #endif
+private:
+   int32_t fVersion;
+   int32_t fTimeBase;
+   int32_t fnbEvents;
+   int32_t fnbBoards;
+   int32_t* fBoardHeaders;
 
 protected:
    /// \cond CLASSIMP

@@ -78,8 +78,10 @@ std::string TLstFile::Status(bool)
 bool TLstFile::Open(const char* filename)
 {
    fFilename = filename;
-   // the first 9 words (= 36 bytes) seem to be a kind of header
-   int headerSize = 36;
+   int32_t headerSize = 0; // Count the number of bytes in the header
+
+   //int32_t* boardHeaders = new int32_t[nbBoards]
+
    try {
       std::ifstream in(GetFilename(), std::ifstream::in | std::ifstream::binary);
       in.seekg(0, std::ifstream::end);
@@ -88,16 +90,33 @@ bool TLstFile::Open(const char* filename)
          return false;
       }
       fFileSize = in.tellg();
+
+      // Read Header Information
+      in.seekg(0, std::ifstream::beg);
+      
+      in.read(reinterpret_cast<char *>(&fVersion), sizeof(int32_t));
+      in.read(reinterpret_cast<char *>(&fTimeBase), sizeof(int32_t));
+      in.read(reinterpret_cast<char *>(&fnbEvents), sizeof(int32_t));
+      in.read(reinterpret_cast<char *>(&fnbBoards), sizeof(int32_t));
+      headerSize += 4*4; // 4 chucks of 4 Bytes
+
+      // Read Board Headers
+      fBoardHeaders = new int32_t[fnbBoards];
+      in.read(reinterpret_cast<char *>(fBoardHeaders), fnbBoards * sizeof(uint32_t));
+      headerSize += 4*fnbBoards;
+
+      // Read rest of bytes into event buffer
       fReadBuffer.resize(fFileSize - headerSize);
       in.seekg(headerSize, std::ifstream::beg);
       in.read(fReadBuffer.data(), fFileSize);
       in.close();
+
    } catch(std::exception& e) {
       std::cout<<"Caught "<<e.what()<<std::endl;
    }
-// Do we need these?
-// signal(SIGPIPE,SIG_IGN); // crash if reading from closed pipe
-// signal(SIGXFSZ,SIG_IGN); // crash if reading from file >2GB without O_LARGEFILE
+   // Do we need these?
+   // signal(SIGPIPE,SIG_IGN); // crash if reading from closed pipe
+   // signal(SIGXFSZ,SIG_IGN); // crash if reading from file >2GB without O_LARGEFILE
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -107,7 +126,7 @@ bool TLstFile::Open(const char* filename)
 	TChannel::SetMnemonicClass(TILLMnemonic::Class());
 
    TRunInfo::SetRunInfo(GetRunNumber(), GetSubRunNumber());
-	TRunInfo::ClearVersion();
+   TRunInfo::ClearVersion();
    TRunInfo::SetVersion(ILLDATA_RELEASE);
 
    std::cout<<"Successfully read "<<fFileSize - headerSize<<" bytes into buffer!"<<std::endl;
