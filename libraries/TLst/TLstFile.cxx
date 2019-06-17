@@ -45,6 +45,8 @@ TLstFile::TLstFile(const char* filename, TRawFile::EOpenType open_type) : TLstFi
 TLstFile::~TLstFile()
 {
    // Default dtor. It closes the read in lst file as well as the output lst file.
+   if( fBoardHeaders != nullptr )
+       delete fBoardHeaders;
    Close();
 }
 
