@@ -33,73 +33,69 @@ bool DefaultFippsSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit
 
 std::function<bool(const TDetectorHit*, const TDetectorHit*)> TFipps::fSuppressionCriterion = DefaultFippsSuppression;
 
-// This seems unnecessary, and why 17?;//  they are static members, and need
-//  to be defined outside the header
-//  17 is to have the detectors go from 1-16
-//  plus we can use position zero
-//  when the detector winds up back in
-//  one of the stands like Alex used in the
-//  gps run. pcb.
-// Initiallizes the HPGe Clover positions as per the wiki
-// <https://www.triumf.info/wiki/tigwiki/index.php/HPGe_Coordinate_Table>
-//                                                                             theta                                 phi
-//                                                                             theta                                phi
-//                                                                             theta
+// Fipps detector locations.
+// Angles are in ISO standard
+// x = cos(theta)*sin(phi)      // Points port
+// y = sin(theta)*sin(phi)      // Points upwards
+// z = sin(theta)               // Points in the direction of the neutrons
+// TVector(x,y,z)
+// TODO: Add link to picture showing detector positions when uploaded
 TVector3 TFipps::gCloverPosition[17] = {
    TVector3(TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
             TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
-            TMath::Cos(TMath::DegToRad() * (0.0))),
-   // Downstream lampshade
-   TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (67.5)),
-            TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (67.5)),
-            TMath::Cos(TMath::DegToRad() * (45.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (157.5)),
-            TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (157.5)),
-            TMath::Cos(TMath::DegToRad() * (45.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (247.5)),
-            TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (247.5)),
-            TMath::Cos(TMath::DegToRad() * (45.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (337.5)),
-            TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (337.5)),
-            TMath::Cos(TMath::DegToRad() * (45.0))),
+            TMath::Cos(TMath::DegToRad() * (0.0))), // Zeroth Position
    // Corona
-   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (22.5)),
-            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (22.5)),
-            TMath::Cos(TMath::DegToRad() * (90.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (67.5)),
-            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (67.5)),
-            TMath::Cos(TMath::DegToRad() * (90.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (112.5)),
-            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (112.5)),
-            TMath::Cos(TMath::DegToRad() * (90.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (157.5)),
-            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (157.5)),
-            TMath::Cos(TMath::DegToRad() * (90.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (202.5)),
-            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (202.5)),
-            TMath::Cos(TMath::DegToRad() * (90.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (247.5)),
-            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (247.5)),
-            TMath::Cos(TMath::DegToRad() * (90.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (292.5)),
-            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (292.5)),
-            TMath::Cos(TMath::DegToRad() * (90.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (337.5)),
-            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (337.5)),
-            TMath::Cos(TMath::DegToRad() * (90.0))),
+   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (90.0)),
+            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (90.0)),
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 0
+   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (45.0)),
+            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (45.0)),
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 1
+   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
+            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 2
+   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (315.0)),
+            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (315.0)),
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 3
+   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (270.0)),
+            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (270.0)),
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 4
+   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (225.0)),
+            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (225.0)),
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 5
+   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (180.0)),
+            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (180.0)),
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 6
+   TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (135.0)),
+            TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (135.0)),
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 7
+   // Downstream lampshade
+   TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (90.0)),
+            TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (90.0)),
+            TMath::Cos(TMath::DegToRad() * (45.0))), // Fipps Pos 8
+   TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
+            TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
+            TMath::Cos(TMath::DegToRad() * (45.0))), // Fipps Pos 9
+   TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (270.0)),
+            TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (270.0)),
+            TMath::Cos(TMath::DegToRad() * (45.0))), // Fipps Pos 10
+   TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (180.0)),
+            TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (180.0)),
+            TMath::Cos(TMath::DegToRad() * (45.0))), // Fipps Pos 11
    // Upstream lampshade
-   TVector3(TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Cos(TMath::DegToRad() * (67.5)),
-            TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (67.5)),
-            TMath::Cos(TMath::DegToRad() * (135.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Cos(TMath::DegToRad() * (157.5)),
-            TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (157.5)),
-            TMath::Cos(TMath::DegToRad() * (135.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Cos(TMath::DegToRad() * (247.5)),
-            TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (247.5)),
-            TMath::Cos(TMath::DegToRad() * (135.0))),
-   TVector3(TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Cos(TMath::DegToRad() * (337.5)),
-            TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (337.5)),
-            TMath::Cos(TMath::DegToRad() * (135.0)))};
+   TVector3(TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Cos(TMath::DegToRad() * (90.0)),
+            TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (90.0)),
+            TMath::Cos(TMath::DegToRad() * (135.0))), // G: 13 F: 12
+   TVector3(TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
+            TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
+            TMath::Cos(TMath::DegToRad() * (135.0))), // G: 16 F: 13
+   TVector3(TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Cos(TMath::DegToRad() * (270.0)),
+            TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (270.0)),
+            TMath::Cos(TMath::DegToRad() * (135.0))), // G: 15 F: 14
+   TVector3(TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Cos(TMath::DegToRad() * (180.0)),
+            TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (180.0)),
+            TMath::Cos(TMath::DegToRad() * (135.0))) // G: 14 F: 15
+            };
 
 // Cross Talk stuff
 const Double_t TFipps::gStrongCT[2]           = {-0.02674, -0.000977}; // This is for the 0-1 and 2-3 combination
@@ -422,8 +418,8 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
 
    // Interaction points may eventually be set externally. May make these members of each crystal, or pass from
    // waveforms.
-   Double_t cp = 26.0; // Crystal Center Point  mm.
-   Double_t id = 45.0; // 45.0;  //Crystal interaction depth mm.
+   Double_t cp = 25.0; // Crystal Center Point  mm. (diameter 50mm)
+   Double_t id = 40.0; // Crystal interaction depth mm. (length 80mm)
    // Set Theta's of the center of each DETECTOR face
    ////Define one Detector position
    TVector3 shift;
@@ -434,8 +430,8 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
    case 3: shift.SetXYZ(-cp, -cp, id); break;
    default: shift.SetXYZ(0, 0, 1); break;
    };
-   shift.RotateY(temp_pos.Theta());
-   shift.RotateZ(temp_pos.Phi());
+   shift.RotateX(temp_pos.Theta());
+   shift.RotateY(temp_pos.Phi());
 
    temp_pos.SetMag(dist);
 
