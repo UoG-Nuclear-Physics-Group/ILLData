@@ -1,4 +1,4 @@
-//TFipps.h TFippsHit.h 
+//TFipps.h TFippsHit.h TFippsBgo.h TFippsBgoHit.h
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -12,6 +12,9 @@
 #pragma link C++ class std::vector<TFippsHit>+;
 #pragma link C++ class std::vector<TFippsHit*>+;
 #pragma link C++ class TFipps+;
+#pragma link C++ class TFippsBgoHit+;
+#pragma link C++ class TFippsBgo+;
+
 
 #endif
 

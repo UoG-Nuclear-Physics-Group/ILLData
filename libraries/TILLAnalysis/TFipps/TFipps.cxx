@@ -15,13 +15,23 @@
 ClassImp(TFipps)
 /// \endcond
 
-bool DefaultAddback(TFippsHit* one, TFippsHit* two)
+
+bool DefaultFippsAddback(const TDetectorHit* one, const TDetectorHit* two)
 {
    return ((one->GetDetector() == two->GetDetector()) &&
            (std::fabs(one->GetTime() - two->GetTime()) < TGRSIOptions::AnalysisOptions()->AddbackWindow()));
 }
 
-std::function<bool(TFippsHit*, TFippsHit*)> TFipps::fAddbackCriterion = DefaultAddback;
+std::function<bool(const TDetectorHit*, const TDetectorHit*)> TFipps::fAddbackCriterion = DefaultFippsAddback;
+
+bool DefaultFippsSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit)
+{
+	return ((hit->GetDetector() == bgoHit->GetDetector()) &&
+	(std::fabs(hit->GetTime() - bgoHit->GetTime()) < TGRSIOptions::AnalysisOptions()->SuppressionWindow()) &&
+	(bgoHit->GetEnergy() > TGRSIOptions::AnalysisOptions()->SuppressionEnergy()));
+}
+
+std::function<bool(const TDetectorHit*, const TDetectorHit*)> TFipps::fSuppressionCriterion = DefaultFippsSuppression;
 
 // This seems unnecessary, and why 17?;//  they are static members, and need
 //  to be defined outside the header
@@ -178,6 +188,21 @@ std::vector<UShort_t>& TFipps::GetAddbackFragVector()
    return fAddbackFrags;
 }
 
+std::vector<TDetectorHit*>& TFipps::GetSuppressedVector()
+{
+    return fSuppressedHits;
+}
+
+std::vector<TDetectorHit*>& TFipps::GetSuppressedAddbackVector()
+{
+    return fSuppressedAddbackHits;
+}
+
+std::vector<UShort_t>& TFipps::GetSuppressedAddbackFragVector()
+{
+    return fSuppressedAddbackFrags;
+}
+
 bool TFipps::IsAddbackSet() const
 {
    return TestBitNumber(EFippsBits::kIsAddbackSet);
@@ -188,6 +213,16 @@ bool TFipps::IsCrossTalkSet() const
    return TestBitNumber(EFippsBits::kIsCrossTalkSet);
 }
 
+bool TFipps::IsSuppressed() const
+{
+    return TestBitNumber(EFippsBits::kIsSuppressedSet);
+}
+
+bool TFipps::IsSuppressedAddbackSet() const
+{
+    return TestBitNumber(EFippsBits::kIsSuppressedAddbackSet);
+}
+
 void TFipps::SetAddback(const Bool_t flag) const
 {
    return SetBitNumber(EFippsBits::kIsAddbackSet, flag);
@@ -196,6 +231,16 @@ void TFipps::SetAddback(const Bool_t flag) const
 void TFipps::SetCrossTalk(const Bool_t flag) const
 {
    return SetBitNumber(EFippsBits::kIsCrossTalkSet, flag);
+}
+
+void TFipps::SetSuppressed(const Bool_t flag) const
+{
+    return SetBitNumber(EFippsBits::kIsSuppressedSet, flag);
+}
+
+void TFipps::SetSuppressedAddback(const Bool_t flag) const
+{
+    return SetBitNumber(EFippsBits::kIsSuppressedAddbackSet, flag);
 }
 
 TDetectorHit* TFipps::GetFippsHit(const int& i)
@@ -214,23 +259,66 @@ TDetectorHit* TFipps::GetFippsHit(const int& i)
    return nullptr;
 }
 
-Int_t TFipps::GetAddbackMultiplicity()
+TDetectorHit* TFipps::GetSuppressedHit(const int& i)
 {
-   // Automatically builds the addback hits using the fAddbackCriterion (if the size of the fAddbackHits vector is zero)
-   // and return the number of addback hits.
+    try {
+        if(!IsCrossTalkSet()) {
+            FixCrossTalk();
+        }
+        return fSuppressedHits.at(i);
+   } catch(const std::out_of_range& oor) {
+      std::cerr<<ClassName()<<"Suppressed hits are out of range: "<<oor.what()<<std::endl;
+      if(!gInterpreter) {
+         throw grsi::exit_exception(1);
+      }
+   }
+   return nullptr;
+}
+
+Int_t TFipps::GetSuppressedMultiplicity(const TBgo* bgo)
+{
+	/// Automatically builds the suppressed hits using the fSuppressionCriterion and returns the number of suppressed hits
    if(!IsCrossTalkSet()) {
       // Calculate Cross Talk on each hit
       FixCrossTalk();
    }
-   auto hit_vec  = GetHitVector();
-   auto ab_vec   = GetAddbackVector();
-   auto frag_vec = GetAddbackFragVector();
+   auto& hit_vec  = GetHitVector();
+   auto& sup_vec  = GetSuppressedVector();
+	if(hit_vec.empty()) {
+		return 0;
+	}
+   // if the suppressed has been reset, clear the suppressed hits
+   if(!IsSuppressed()) {
+      sup_vec.clear();
+   }
+   if(sup_vec.empty()) {
+		CreateSuppressed(bgo, hit_vec, sup_vec);
+      SetSuppressed(true);
+   }
+
+   return sup_vec.size();
+}
+    
+
+Int_t TFipps::GetAddbackMultiplicity()
+{
+   // Automatically builds the addback hits using the fAddbackCriterion (if
+   // the size of the fAddbackHits vector is zero) and return the number of
+   // addback hits.
+   if(!IsCrossTalkSet()) {
+      FixCrossTalk();
+   }
+   auto& hit_vec  = GetHitVector();
+   auto& ab_vec   = GetAddbackVector();
+   auto& frag_vec = GetAddbackFragVector();
    if(hit_vec.empty()) {
       return 0;
    }
+
    // if the addback has been reset, clear the addback hits
    if(!IsAddbackSet()) {
       ab_vec.clear();
+      frag_vec.clear();
    }
    if(ab_vec.empty()) {
 		CreateAddback(hit_vec, ab_vec, frag_vec);
@@ -240,13 +328,64 @@ Int_t TFipps::GetAddbackMultiplicity()
    return ab_vec.size();
 }
 
+Int_t TFipps::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
+{
+   // Automatically builds the addback hits using the fAddbackCriterion (if
+   // the size of the fAddbackHits vector is zero) and return the number of
+   // addback hits.
+   if(!IsCrossTalkSet()) {
+      FixCrossTalk();
+   }
+   auto& hit_vec  = GetSuppressedVector();
+   auto& ab_vec   = GetSuppressedAddbackVector();
+   auto& frag_vec = GetSuppressedAddbackFragVector();
+   if(hit_vec.empty()) {
+      return 0;
+   }
+
+   // if the addback has been reset, clear the addback hits
+   if(!IsAddbackSet()) {
+      ab_vec.clear();
+      frag_vec.clear();
+   }
+   if(ab_vec.empty()) {
+		CreateSuppressedAddback(bgo, hit_vec, ab_vec, frag_vec);
+        SetSuppressedAddback(true);
+   }
+
+   return ab_vec.size();
+}
+
+
 TDetectorHit* TFipps::GetAddbackHit(const int& i)
 {
-   if(i < GetAddbackMultiplicity()) {
-      return GetAddbackVector().at(i);
+   try{
+       if(!IsCrossTalkSet()) {
+           FixCrossTalk();
+       }
+       return static_cast<TDetectorHit*>(GetAddbackVector().at(i));
+   } catch(const std::out_of_range& oor) {
+       std::cerr<<ClassName()<<" Addback hits are out of range: "<<oor.what()<<std::endl;
+       if(!gInterpreter) {
+           throw grsi::exit_exception(1);
+       }
    }
-   std::cerr<<"Addback hits are out of range"<<std::endl;
-   throw grsi::exit_exception(1);
+   return nullptr;
+}
+
+TDetectorHit* TFipps::GetSuppressedAddbackHit(const int& i)
+{
+   try{
+       if(!IsCrossTalkSet()) {
+           FixCrossTalk();
+       }
+       return static_cast<TDetectorHit*>(GetSuppressedAddbackVector().at(i));
+   } catch(const std::out_of_range& oor) {
+       std::cerr<<ClassName()<<" Suppressed addback hits are out of range: "<<oor.what()<<std::endl;
+       if(!gInterpreter) {
+           throw grsi::exit_exception(1);
+       }
+   }
    return nullptr;
 }
 
@@ -314,6 +453,21 @@ void TFipps::ResetAddback()
    SetCrossTalk(false);
    GetAddbackVector().clear();
    GetAddbackFragVector().clear();
+}
+
+void TFipps::ResetSuppressed()
+{
+    SetSuppressed(false);
+    GetSuppressedVector().clear();
+}
+
+void TFipps::ResetSuppressedAddback()
+{
+   SetAddback(false);
+   SetCrossTalk(false);
+   SetSuppressed(false);
+   GetSuppressedAddbackVector().clear();
+   GetSuppressedAddbackFragVector().clear();
 }
 
 UShort_t TFipps::GetNAddbackFrags(const size_t& idx)
