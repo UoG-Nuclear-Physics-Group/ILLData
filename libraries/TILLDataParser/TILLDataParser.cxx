@@ -49,6 +49,7 @@ int TILLDataParser::FippsToFragment(char* data, uint32_t size)
    // *=* LST File Parsing *=* //
    // This section is for reading in V1 .lst files of a C1725 board
    // TODO: Change this to read in both V1 and V2 type files, as well as all possible DAQ boards at ILL.
+   // This reqires reading the header at the beginning of the .lst file to find the version.
 
    // we read 4 words for each event, and size is in bytes, so we need to divide it by 4 (size of uint32_t)
    for(size_t i = 0; i + 3 < size / 4; i += 4) {
@@ -57,20 +58,29 @@ int TILLDataParser::FippsToFragment(char* data, uint32_t size)
          --(*fInputSize);
       }
 
-      //*=* Address bits *=*//
       // Crate: (buffer >> 28) & 0xF (4 Bits)
       // Board: (buffer >>  22) & 0x3F (6 Bits)
+      EDigitizer Board = static_cast<EDigitizer>(( ptr[i] >> 22) & 0x3F);
+      
       // Channel: (Buffer >> 16) & 0x3F (6 Bits)
       eventFrag->SetAddress( (ptr[i] >> 16) & 0xffff );
 
       //*=* Timestamp bits *=*//
 
-      // Rollover
+      // Rollover, constant beween boards
       tmpTimestamp = ptr[i] & 0xffff;
       tmpTimestamp = tmpTimestamp<<31;
 
-      // Concatonate timestamp information
-      tmpTimestamp |= ptr[i + 1] & 0x7fffffff;
+      // Concatonate timestamp informatioan
+      if( Board == EDigitizer::kV1724 ) {
+          // Timestamp bits is 30
+          tmpTimestamp |= ptr[ i + 1 ] & 0x3FFFFFFF;
+      } else if ( Board == EDigitizer::kV1725_PHA ) {
+          // Timestamp bits is 31
+          tmpTimestamp |= ptr[i + 1] & 0x7fffffff;
+      } else {
+          tmpTimestamp |= ptr[i + 1] & 0xffffffff;
+      }
       eventFrag->SetTimeStamp(tmpTimestamp);
 
       ++totalEventsRead;
