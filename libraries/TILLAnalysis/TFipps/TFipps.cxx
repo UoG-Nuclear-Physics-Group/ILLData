@@ -423,6 +423,8 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
    // Set Theta's of the center of each DETECTOR face
    ////Define one Detector position
    TVector3 shift;
+   TVector3 DetectorCenter;
+   DetectorCenter.SetXYZ(0, 0, 1); // Center of the clover
    switch(CryNbr) {
    case 0: shift.SetXYZ(-cp, cp, id); break;
    case 1: shift.SetXYZ(cp, cp, id); break;
@@ -430,8 +432,10 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
    case 3: shift.SetXYZ(-cp, -cp, id); break;
    default: shift.SetXYZ(0, 0, 1); break;
    };
+   // Roate the crystal to where the detector is
    shift.RotateX(temp_pos.Theta());
-   shift.RotateY(temp_pos.Phi());
+   DetectorCenter.RotateX(temp_pos.Theta());
+   shift.RotateY(DetectorCenter.Angle(temp_pos));
 
    temp_pos.SetMag(dist);
 
