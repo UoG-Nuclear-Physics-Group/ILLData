@@ -416,15 +416,19 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
 
    TVector3 temp_pos(gCloverPosition[DetNbr]);
 
+   // The axis represent:
+   // XAxis: Array's Port
+   // YAxis: Upwards
+   // ZAxis: Points in the neutron beam direction
+   TVector3 XAxis(1,0,0); TVector3 YAxis(0,1,0); TVector3 ZAxis(0, 0, 1);
+
    // Interaction points may eventually be set externally. May make these members of each crystal, or pass from
    // waveforms.
    Double_t cp = 25.0; // Crystal Center Point  mm. (diameter 50mm)
    Double_t id = 40.0; // Crystal interaction depth mm. (length 80mm)
    // Set Theta's of the center of each DETECTOR face
    ////Define one Detector position
-   TVector3 shift;
-   TVector3 DetectorCenter;
-   DetectorCenter.SetXYZ(0, 0, 1); // Center of the clover
+   TVector3 shift; TVector3 DetectorCenter;
    switch(CryNbr) {
    case 0: shift.SetXYZ(-cp, cp, id); break;
    case 1: shift.SetXYZ(cp, cp, id); break;
@@ -432,10 +436,17 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
    case 3: shift.SetXYZ(-cp, -cp, id); break;
    default: shift.SetXYZ(0, 0, 1); break;
    };
-   // Roate the crystal to where the detector is
-   shift.RotateX(temp_pos.Theta());
-   DetectorCenter.RotateX(temp_pos.Theta());
-   shift.RotateY(DetectorCenter.Angle(temp_pos));
+   DetectorCenter.SetXYZ(0, 0, 1);
+   // Rotate in the XZ plain to where the detector is
+   TVector3 XZProjection = temp_pos - (temp_pos*YAxis)*YAxis;
+   Double_t YRotationAngle = XZProjection.Angle(ZAxis);
+   shift.RotateY(YRotationAngle);
+   DetectorCenter.RotateY(YRotationAngle);
+
+   // Rotate upto the angle of the detector
+   Double_t RotationAngle = DetectorCenter.Angle(temp_pos);
+   TVector3 RotationAxis = DetectorCenter.Cross(temp_pos).Unit();
+   shift.Rotate( RotationAngle, RotationAxis );
 
    temp_pos.SetMag(dist);
 
