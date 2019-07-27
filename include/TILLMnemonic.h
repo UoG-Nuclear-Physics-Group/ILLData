@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "TClass.h"
 
-enum class EDigitizer : char { kDefault, kCAEN8, kCaen };
+enum class EDigitizer : char { kDefault, kV1724, kV1725, kV1730, kV1751 };
 
 class TILLMnemonic : public TMnemonic {
 public:
@@ -19,7 +19,12 @@ public:
    // These separations exist only to easily see the difference when looking at the code here.
    enum class ESystem {
       kFipps,           //0
-		kClear            //1
+      kFippsBgo,        //1
+      kFippsLaBr,       //2
+      kFippsLaBrBgo,    //3
+      kFippsTAC,        //4
+      kFippsPulser,
+      kClear          //6
    };
 
    ESystem   System() const { return fSystem; }
