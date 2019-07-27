@@ -48,6 +48,15 @@ public:
    // ENUM(EBank, char, kWFDN,kGRF1,kGRF2,kGRF3,kFME0,kFME1,kFME2,kFME3);
    enum class EBank { kWFDN = 0, kGRF1 = 1, kGRF2 = 2, kGRF3 = 3, kGRF4 = 4, kFME0 = 5, kFME1 = 6, kFME2 = 7, kFME3 = 8 };
 
+   enum class EDigitizer {
+       kV1751 = 1,
+       kV1724 = 2,
+       kV1730_PSD = 3,
+       kV1730_PHA = 4,
+       kV1725_PHA = 7,
+       kV1725_PSD = 8
+   };
+
    enum class EDataParserState {
       kGood,
       kBadHeader,
