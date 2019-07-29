@@ -414,13 +414,11 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
       return TVector3(0, 0, 1);
    }
 
-   TVector3 temp_pos(gCloverPosition[DetNbr]);
+   TVector3 CloverPosition(gCloverPosition[DetNbr]);
 
-   // The axis represent:
    // XAxis: Array's Port
    // YAxis: Upwards
    // ZAxis: Points in the neutron beam direction
-   TVector3 XAxis(1,0,0); TVector3 YAxis(0,1,0); TVector3 ZAxis(0, 0, 1);
 
    // Interaction points may eventually be set externally. May make these members of each crystal, or pass from
    // waveforms.
@@ -428,29 +426,22 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
    Double_t id = 40.0; // Crystal interaction depth mm. (length 80mm)
    // Set Theta's of the center of each DETECTOR face
    ////Define one Detector position
-   TVector3 shift; TVector3 DetectorCenter;
+   TVector3 CrystalPosition;
    switch(CryNbr) {
-   case 0: shift.SetXYZ(-cp, cp, id); break;
-   case 1: shift.SetXYZ(cp, cp, id); break;
-   case 2: shift.SetXYZ(cp, -cp, id); break;
-   case 3: shift.SetXYZ(-cp, -cp, id); break;
-   default: shift.SetXYZ(0, 0, 1); break;
+   case 0: CrystalPosition.SetXYZ(-cp, cp, id); break;
+   case 1: CrystalPosition.SetXYZ(cp, cp, id); break;
+   case 2: CrystalPosition.SetXYZ(cp, -cp, id); break;
+   case 3: CrystalPosition.SetXYZ(-cp, -cp, id); break;
+   default: CrystalPosition.SetXYZ(0, 0, 1); break;
    };
-   DetectorCenter.SetXYZ(0, 0, 1);
-   // Rotate in the XZ plain to where the detector is
-   TVector3 XZProjection = temp_pos - (temp_pos*YAxis)*YAxis;
-   Double_t YRotationAngle = XZProjection.Angle(ZAxis);
-   shift.RotateY(YRotationAngle);
-   DetectorCenter.RotateY(YRotationAngle);
+   // Rotate counterclockwise from the downstream position
+   CrystalPosition.RotateX(-CloverPosition.Theta());
+   // Rotate around the neutron beam
+   CrystalPosition.RotateZ(CloverPosition.Phi());
+   // Set distance of detector from target
+   CloverPosition.SetMag(dist);
 
-   // Rotate upto the angle of the detector
-   Double_t RotationAngle = DetectorCenter.Angle(temp_pos);
-   TVector3 RotationAxis = DetectorCenter.Cross(temp_pos).Unit();
-   shift.Rotate( RotationAngle, RotationAxis );
-
-   temp_pos.SetMag(dist);
-
-   return (temp_pos + shift);
+   return (CloverPosition + CrystalPosition);
 }
 
 void TFipps::ResetFlags() const
