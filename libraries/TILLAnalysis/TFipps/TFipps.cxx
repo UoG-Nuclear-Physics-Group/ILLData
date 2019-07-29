@@ -428,10 +428,10 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
    ////Define one Detector position
    TVector3 CrystalPosition;
    switch(CryNbr) {
-   case 0: CrystalPosition.SetXYZ(-cp, cp, id); break;
-   case 1: CrystalPosition.SetXYZ(cp, cp, id); break;
-   case 2: CrystalPosition.SetXYZ(cp, -cp, id); break;
-   case 3: CrystalPosition.SetXYZ(-cp, -cp, id); break;
+   case 0: CrystalPosition.SetXYZ(-cp, cp, id); break;  // BLUE
+   case 1: CrystalPosition.SetXYZ(cp, cp, id); break;   // GREEN
+   case 2: CrystalPosition.SetXYZ(cp, -cp, id); break;  // RED
+   case 3: CrystalPosition.SetXYZ(-cp, -cp, id); break; // WHITE
    default: CrystalPosition.SetXYZ(0, 0, 1); break;
    };
    // Rotate counterclockwise from the downstream position
