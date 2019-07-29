@@ -8,10 +8,10 @@ The data parser is set up to process FIPPS data written in the lst data format.
 Several detector classes are implimented: Fipps HPGe (TFipps), LaBr (TFippsLaBr), TAC (TFippsTAC), etc.
 
 Other classes included are:
- - the file and event classes for LST files,
- - the TILLMnemonic class which provides an enumeration for the detector systems and digitizers,
- - the TILLDetectorInformation which only provides functions to tell whether FIPPS data is present (which should be all the time), and
- - the TILLDetectorHit, which implemements the algorithm for how to get the time in nanoseconds from the timestamp and CFD information.
+ - File and event classes for LST files,
+ - TILLMnemonic, which provides an enumeration for the detector systems and digitizers,
+ - TILLDetectorInformation, which only provides functions to tell whether FIPPS data is present (which should be all the time), and
+ - TILLDetectorHit, which implemements the algorithm for how to get the time in nanoseconds from the timestamp and CFD information.
 
 ## Cal Information
 
@@ -32,4 +32,4 @@ In order to match the GRIFFIN clover colors to the FIPPS clover numbers the foll
 | 2                  | White          |
 | 3                  | Red            |
 
-If the stated rules are followed, there should be a 1-to-1 relationship between the GRIFFIN crystals and FIPPS crytals (relative to eachother). 
+If the stated rules are followed, there should be a 1-to-1 relationship between the GRIFFIN crystals and FIPPS crystals from the targets frame of reference. 
