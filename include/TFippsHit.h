@@ -43,7 +43,7 @@ public:
    TVector3 GetPosition() const override;
 
 private:
-   Double_t GetDefaultDistance() const { return 110.; }
+   Double_t GetDefaultDistance() const { return 90.; } // Target to detector distance is 90mm (Unless suppressed)
 
    /// \cond CLASSIMP
    ClassDefOverride(TFippsHit, 2); // Information about a FIPPS Hit

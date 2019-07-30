@@ -32,14 +32,14 @@
 class TFipps : public TSuppressed {
 public:
    enum class EFippsBits {
-      kIsAddbackSet   = 1<<0,
-      kIsCrossTalkSet = 1<<1,
-      kBit2           = 1<<2,
-      kBit3           = 1<<3,
-      kBit4           = 1<<4,
-      kBit5           = 1<<5,
-      kBit6           = 1<<6,
-      kBit7           = 1<<7
+      kIsAddbackSet             = 1<<0,
+      kIsCrossTalkSet           = 1<<1,
+      kIsSuppressedSet          = 1<<2,
+      kIsSuppressedAddbackSet   = 1<<3,
+      kBit4                     = 1<<4,
+      kBit5                     = 1<<5,
+      kBit6                     = 1<<6,
+      kBit7                     = 1<<7
    };
 
    TFipps();
@@ -58,22 +58,45 @@ public:
    TFipps& operator=(const TFipps&); //!<!
 
 #if !defined(__CINT__) && !defined(__CLING__)
-   void SetAddbackCriterion(std::function<bool(TFippsHit*, TFippsHit*)> criterion)
+   void SetAddbackCriterion(std::function<bool(const TDetectorHit*, const TDetectorHit*)> criterion)
    {
       fAddbackCriterion = std::move(criterion);
    }
-   std::function<bool(TFippsHit*, TFippsHit*)> GetAddbackCriterion() const { return fAddbackCriterion; }
+   std::function<bool(const TDetectorHit*, const TDetectorHit*)> GetAddbackCriterion() const { return fAddbackCriterion; }
+
+   bool AddbackCriterion(const TDetectorHit* hit1, const TDetectorHit* hit2) override { return fAddbackCriterion(hit1, hit2); }
 #endif
 
    Int_t         GetAddbackMultiplicity();
    TDetectorHit* GetAddbackHit(const int& i);
    bool          IsAddbackSet() const;
    void          ResetAddback();
+   void          ResetSuppressed();
+   void          ResetSuppressedAddback();
    UShort_t      GetNAddbackFrags(const size_t& idx);
+
+   TDetectorHit*    GetSuppressedHit(const int& i);
+   Int_t         GetSuppressedMultiplicity( const TBgo* bgo );
+   bool          IsSuppressed() const;
+
+#if !defined(__CINT__) && !defined(__CLING__)
+   void SetSuppressionCriterion(std::function<bool(const TDetectorHit*, const TDetectorHit*)> criterion)
+   {
+      fSuppressionCriterion = std::move(criterion);
+   }
+   std::function<bool(const TDetectorHit*, const TDetectorHit*)> GetSuppressionCriterion() const { return fSuppressionCriterion; }
+
+   bool SuppressionCriterion(const TDetectorHit* hit, const TDetectorHit* bgoHit) override { return fSuppressionCriterion(hit, bgoHit); }
+#endif
+
+   TDetectorHit*    GetSuppressedAddbackHit( const int& i );
+   Int_t            GetSuppressedAddbackMultiplicity(const TBgo* bgo);
+   bool IsSuppressedAddbackSet() const;
 
 private:
 #if !defined(__CINT__) && !defined(__CLING__)
-   static std::function<bool(TFippsHit*, TFippsHit*)> fAddbackCriterion;
+   static std::function<bool(const TDetectorHit*, const TDetectorHit*)> fAddbackCriterion;
+   static std::function<bool(const TDetectorHit*, const TDetectorHit*)> fSuppressionCriterion;
 #endif
 
    // static bool fSetBGOHits;                //!<!  Flag that determines if BGOHits are being measured
@@ -82,6 +105,9 @@ private:
 
    mutable std::vector<TDetectorHit*> fAddbackHits;  //!<! Used to create addback hits on the fly
    mutable std::vector<UShort_t>  fAddbackFrags; //!<! Number of crystals involved in creating in the addback hit
+   mutable std::vector<TDetectorHit*> fSuppressedHits;
+   mutable std::vector<TDetectorHit*> fSuppressedAddbackHits;
+   mutable std::vector<UShort_t> fSuppressedAddbackFrags;
 
 public:
    // static bool SetBGOHits()       { return fSetBGOHits;   }  //!<!
@@ -106,8 +132,13 @@ private:
    // This is where the general untouchable functions live.
    std::vector<TDetectorHit*>& GetAddbackVector();     //!<!
    std::vector<UShort_t>&   GetAddbackFragVector(); //!<!
+   std::vector<TDetectorHit*>& GetSuppressedVector();
+   std::vector<TDetectorHit*>& GetSuppressedAddbackVector();
+   std::vector<UShort_t>& GetSuppressedAddbackFragVector();
    void SetAddback(bool flag = true) const;
    void SetCrossTalk(bool flag = true) const;
+   void SetSuppressed(bool flag = true) const;
+   void SetSuppressedAddback(bool flag = true) const;
 
 public:
    void Copy(TObject&) const override;            //!<!

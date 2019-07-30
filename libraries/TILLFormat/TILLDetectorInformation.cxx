@@ -1,6 +1,7 @@
 #include "TILLDetectorInformation.h"
 
 #include <iostream>
+#include <unordered_map>
 
 #include "TROOT.h"
 
@@ -30,6 +31,11 @@ void TILLDetectorInformation::Print(Option_t* opt) const
    // a: Print out more details.
    if(strchr(opt, 'a') != nullptr) {
       printf("\t\tFIPPS:            %s\n", Fipps() ? "true" : "false");
+      printf("\t\tFIPPSBGO:         %s\n", FippsBgo() ? "true" : "false");
+      printf("\t\tFIPPSLABR:        %s\n", FippsLaBr() ? "true" : "false");
+      printf("\t\tFIPPSLABRBGO:     %s\n", FippsLaBrBgo() ? "true" : "false");
+      printf("\t\tFIPPSTAC:         %s\n", FippsTAC() ? "true" : "false");
+      printf("\t\tFIPPSPULSER:      %s\n", FippsPulser() ? "true" : "false");
       printf("\n");
    }
 }
@@ -47,7 +53,7 @@ void TILLDetectorInformation::Clear(Option_t*)
 void TILLDetectorInformation::Set()
 {
    /// Sets the run info. This figures out what systems are available.
-   std::map<unsigned int, TChannel*>::iterator iter;
+   std::unordered_map<unsigned int, TChannel*>::iterator iter;
    for(iter = TChannel::GetChannelMap()->begin(); iter != TChannel::GetChannelMap()->end(); iter++) {
       std::string channelname = iter->second->GetName();
 
@@ -56,6 +62,21 @@ void TILLDetectorInformation::Set()
       switch(static_cast<const TILLMnemonic*>(iter->second->GetMnemonic())->System()) {
 			case TILLMnemonic::ESystem::kFipps:
 				SetFipps();
+				break;
+			case TILLMnemonic::ESystem::kFippsBgo:
+				SetFippsBgo();
+				break;
+			case TILLMnemonic::ESystem::kFippsLaBr:
+				SetFippsLaBr();
+				break;
+			case TILLMnemonic::ESystem::kFippsLaBrBgo:
+				SetFippsLaBrBgo();
+				break;
+			case TILLMnemonic::ESystem::kFippsTAC:
+				SetFippsTAC();
+				break;
+			case TILLMnemonic::ESystem::kFippsPulser:
+				SetFippsPulser();
 				break;
 			default:
 				break;
