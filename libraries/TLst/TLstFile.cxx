@@ -1,4 +1,5 @@
 #include <iostream>
+#include <bitset>
 #include <fstream>
 #include <cstdio>
 #include <cstring>
@@ -109,21 +110,13 @@ bool TLstFile::Open(const char* filename)
       fInputStream.read(reinterpret_cast<char *>(fBoardHeaders), fnbBoards * sizeof(uint32_t));
       headerSize += 4*fnbBoards;
 
-      // Read rest of bytes into event buffer
-//  fReadBuffer.resize(fFileSize - headerSize);
+      fReadBuffer.reserve(READ_EVENT_SIZE*4*sizeof(int32_t));
+      fReadBuffer.resize(READ_EVENT_SIZE*4*sizeof(int32_t));
       fInputStream.seekg(headerSize, std::ifstream::beg);
-    //  fInputStream.read(fReadBuffer.data(), fFileSize);
 
    } catch(std::exception& e) {
-      std::cout<<"Caught "<<e.what()<<std::endl;
+      std::cout<<"Caught "<<e.what() << " at " << __FILE__ << " : "  << __LINE__ <<std::endl;
    }
-   // Do we need these?
-   // signal(SIGPIPE,SIG_IGN); // crash if reading from closed pipe
-   // signal(SIGXFSZ,SIG_IGN); // crash if reading from file >2GB without O_LARGEFILE
-
-#ifndef O_LARGEFILE
-#define O_LARGEFILE 0
-#endif
 
 	// setup TChannel to use our mnemonics
 	TChannel::SetMnemonicClass(TILLMnemonic::Class());
@@ -145,25 +138,43 @@ void TLstFile::Close()
    fInputStream.close();
 }
 
-/// \param [in] lstEvent Pointer to an empty TLstEvent
+/// \param [in] Event Pointer to an empty TLstEvent
 /// \returns "true" for success, "false" for failure, see GetLastError() to see why
 ///
 ///  EDITED FROM THE ORIGINAL TO RETURN TOTAL SUCESSFULLY BYTES READ INSTEAD OF TRUE/FALSE,  PCB
 ///
-int TLstFile::Read(std::shared_ptr<TRawEvent> lstEvent)
+int TLstFile::Read(std::shared_ptr<TRawEvent> Event)
 {
+   if( Event == nullptr )
+      return -1;
+
+   size_t LastReadSize = 0;
+   std::shared_ptr<TLstEvent> LstEvent = std::static_pointer_cast<TLstEvent>(Event);
+   LstEvent->Clear();
+
+
    if(fBytesRead < fFileSize) {
-      fReadBuffer.clear();
+      // Fill the buffer
       try {
-          fInputStream.read( fReadBuffer.data(), READ_EVENT_SIZE*(4*sizeof(int32_t)) );
-          fBytesRead += fInputStream.gcount();
-         std::static_pointer_cast<TLstEvent>(lstEvent)->SetData(fReadBuffer);
+         char* tempBuff = new char [READ_EVENT_SIZE*4*sizeof(int32_t)] ; 
+         fInputStream.read( tempBuff, READ_EVENT_SIZE*4*sizeof(int32_t));
+         LastReadSize = static_cast<size_t>(fInputStream.gcount());
+         fBytesRead += LastReadSize;
+
+         fReadBuffer.clear();
+         for(size_t i = 0; i < LastReadSize; i++) {
+            fReadBuffer.push_back(tempBuff[i]);
+         }
+
+         delete tempBuff;
       } catch(std::exception& e) {
-         std::cout<<e.what()<<std::endl;
+         std::cout<<"Caught "<<e.what() << " at " << __FILE__ << " : "  << __LINE__ <<std::endl;
       }
-      //fBytesRead = fFileSize;
-      //return fFileSize;
-      return fInputStream.gcount();
+
+      // Write data to event
+      LstEvent->SetData(fReadBuffer);
+
+      return LastReadSize;
    }
    return 0;
 }
