@@ -42,8 +42,8 @@ int TILLDataParser::FippsToFragment(char* data, uint32_t size)
    std::shared_ptr<TFragment> eventFrag       = std::make_shared<TFragment>();
    Long64_t                   tmpTimestamp;
    if(fItemsPopped != nullptr && fInputSize != nullptr) {
-      *fItemsPopped = 0;
-      *fInputSize   = size/16; //4 words of 4 bytes for each event
+      *fItemsPopped += 0;
+      *fInputSize   += size/16; //4 words of 4 bytes for each event
    }
 
    // *=* LST File Parsing *=* //
