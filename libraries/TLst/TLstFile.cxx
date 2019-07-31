@@ -22,7 +22,7 @@
 #include "TILLMnemonic.h"
 #include "ILLDataVersion.h"
 
-#define READ_EVENT_SIZE 10000
+#define READ_EVENT_SIZE 1000000
 
 /// \cond CLASSIMP
 ClassImp(TLstFile)
@@ -48,7 +48,7 @@ TLstFile::~TLstFile()
 {
    // Default dtor. It closes the read in lst file as well as the output lst file.
    if( fBoardHeaders != nullptr )
-       delete fBoardHeaders;
+       delete[] fBoardHeaders;
    Close();
 }
 
@@ -87,7 +87,7 @@ bool TLstFile::Open(const char* filename)
    //int32_t* boardHeaders = new int32_t[nbBoards]
 
    try {
-      std::ifstream in(GetFilename(), std::ifstream::in | std::ifstream::binary);
+      fInputStream.open(GetFilename(), std::ifstream::in | std::ifstream::binary);
       fInputStream.seekg(0, std::ifstream::end);
       if(fInputStream.tellg() < 0) {
          std::cout<<R"(Failed to open ")"<<GetFilename()<<"/"<<fFilename<<R"("!)"<<std::endl;
@@ -154,15 +154,16 @@ int TLstFile::Read(std::shared_ptr<TRawEvent> lstEvent)
 {
    if(fBytesRead < fFileSize) {
       fReadBuffer.clear();
-      fInputStream.read( fReadBuffer.data(), READ_EVENT_SIZE*(4*sizeof(int32_t)) );
-      fBytesRead += READ_EVENT_SIZE*4*sizeof(int32_t);
       try {
+          fInputStream.read( fReadBuffer.data(), READ_EVENT_SIZE*(4*sizeof(int32_t)) );
+          fBytesRead += fInputStream.gcount();
          std::static_pointer_cast<TLstEvent>(lstEvent)->SetData(fReadBuffer);
       } catch(std::exception& e) {
          std::cout<<e.what()<<std::endl;
       }
       //fBytesRead = fFileSize;
-      return fFileSize;
+      //return fFileSize;
+      return fInputStream.gcount();
    }
    return 0;
 }
