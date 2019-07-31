@@ -58,6 +58,7 @@ private:
    int32_t fnbEvents;
    int32_t fnbBoards;
    int32_t* fBoardHeaders;
+   std::ifstream fInputStream;
 
 protected:
    /// \cond CLASSIMP
