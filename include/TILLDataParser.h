@@ -88,7 +88,8 @@ public:
 #endif
 
 private:
-	int FippsToFragment(char* data, uint32_t size);
+   int V1SingleFippsEventToFragment(char* data);
+   int V2SingleFippsEventToFragment(char* data);
 
 	EDataParserState fState;
 };
