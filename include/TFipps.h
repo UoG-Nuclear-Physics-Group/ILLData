@@ -111,9 +111,9 @@ private:
 
 public:
    // static bool SetBGOHits()       { return fSetBGOHits;   }  //!<!
+   static TVector3 gCloverPosition[17];                    //!<! Position of each HPGe Clover
 
 private:
-   static TVector3 gCloverPosition[17];                    //!<! Position of each HPGe Clover
    void            ClearStatus() const { fFippsBits = 0; } //!<!
    void SetBitNumber(EFippsBits bit, Bool_t set) const;
    Bool_t TestBitNumber(EFippsBits bit) const { return fFippsBits.TestBit(bit); }

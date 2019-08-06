@@ -435,7 +435,7 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
    default: CrystalPosition.SetXYZ(0, 0, 1); break;
    };
    // Rotate counterclockwise from the downstream position
-   CrystalPosition.RotateX(-CloverPosition.Theta());
+   CrystalPosition.RotateY(CloverPosition.Theta());
    // Rotate around the neutron beam
    CrystalPosition.RotateZ(CloverPosition.Phi());
    // Set distance of detector from target
