@@ -49,7 +49,7 @@ public:
 public:
    TDetectorHit* GetFippsHit(const Int_t& i);
 
-   static TVector3 GetPosition(int DetNbr, int CryNbr = 5, double dist = 110.0); //!<!
+   static TVector3 GetPosition(int DetNbr, int CryNbr = 5, double dist = 90.0); //!<!
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
@@ -111,9 +111,9 @@ private:
 
 public:
    // static bool SetBGOHits()       { return fSetBGOHits;   }  //!<!
-   static TVector3 gCloverPosition[17];                    //!<! Position of each HPGe Clover
 
 private:
+   static TVector3 gCloverPosition[17];                    //!<! Position of each HPGe Clover
    void            ClearStatus() const { fFippsBits = 0; } //!<!
    void SetBitNumber(EFippsBits bit, Bool_t set) const;
    Bool_t TestBitNumber(EFippsBits bit) const { return fFippsBits.TestBit(bit); }
