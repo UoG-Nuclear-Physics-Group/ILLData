@@ -49,7 +49,7 @@ public:
 public:
    TDetectorHit* GetFippsHit(const Int_t& i);
 
-   static TVector3 GetPosition(int DetNbr, int CryNbr = 5, double dist = 110.0); //!<!
+   static TVector3 GetPosition(int DetNbr, int CryNbr = 5, double dist = 90.0); //!<!
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif

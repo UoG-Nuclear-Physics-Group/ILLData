@@ -27,9 +27,9 @@ In order to match the GRIFFIN clover colors to the FIPPS clover numbers the foll
 
 | FIPPS Clover Label | Cal File Color |
 |:------------------:|:--------------:|
-| 0                  | Green          |
-| 1                  | Blue           |
-| 2                  | White          |
-| 3                  | Red            |
+| 0                  | Red            |
+| 1                  | White          |
+| 2                  | Blue           |
+| 3                  | Green          |
 
 If the stated rules are followed, there should be a 1-to-1 relationship between the GRIFFIN crystals and FIPPS crystals from the targets frame of reference. 

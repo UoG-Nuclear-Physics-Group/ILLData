@@ -422,7 +422,7 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
 
    // Interaction points may eventually be set externally. May make these members of each crystal, or pass from
    // waveforms.
-   Double_t cp = 25.0; // Crystal Center Point  mm. (diameter 50mm)
+   Double_t cp = 17.678;//25.0; // Crystal Center Point  mm. (diameter 50mm)
    Double_t id = 40.0; // Crystal interaction depth mm. (length 80mm)
    // Set Theta's of the center of each DETECTOR face
    ////Define one Detector position
@@ -435,7 +435,7 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
    default: CrystalPosition.SetXYZ(0, 0, 1); break;
    };
    // Rotate counterclockwise from the downstream position
-   CrystalPosition.RotateX(-CloverPosition.Theta());
+   CrystalPosition.RotateY(CloverPosition.Theta());
    // Rotate around the neutron beam
    CrystalPosition.RotateZ(CloverPosition.Phi());
    // Set distance of detector from target
