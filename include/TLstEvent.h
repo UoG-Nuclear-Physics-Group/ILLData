@@ -38,14 +38,14 @@ public:
 
    char* GetData() override; ///< return pointer to the data buffer
    void SetData(std::vector<char>& buffer); ///< set an externally allocated data buffer
-   void SetLstVersion(int8_t version) { fLstVersion = version };
-   int8_t GetLstVersion() { return fLstVersion };
+   void SetLstVersion(int32_t version) { fLstVersion = version; };
+   int8_t GetLstVersion() { return fLstVersion; };
 
    int SwapBytes(bool) override; ///< convert event data between little-endian (Linux-x86) and big endian (MacOS-PPC)
 
 protected:
    std::vector<char> fData; ///< event data buffer
-   int8_t fLstVersion; ///< Lst version
+   int32_t fLstVersion = 1; ///< Lst version
 
    /// \cond CLASSIMP
    ClassDefOverride(TLstEvent, 0) // All of the data contained in a Midas Event
