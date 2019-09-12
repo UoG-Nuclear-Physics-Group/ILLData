@@ -152,6 +152,8 @@ int TLstFile::Read(std::shared_ptr<TRawEvent> Event)
    std::shared_ptr<TLstEvent> LstEvent = std::static_pointer_cast<TLstEvent>(Event);
    LstEvent->Clear();
 
+   LstEvent->SetLstVersion(fVersion);
+
 
    if(fBytesRead < fFileSize) {
       // Fill the buffer
