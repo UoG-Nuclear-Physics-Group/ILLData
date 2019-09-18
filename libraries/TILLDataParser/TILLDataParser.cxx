@@ -37,7 +37,7 @@ int TILLDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
    uint32_t* EvntData = reinterpret_cast<uint32_t*>(event->GetData());
 
    if( fInputSize != nullptr )
-      *fInputSize += event->GetDataSize()/4; // 16 bytes per event, number of bytes in 32bits
+      *fInputSize += event->GetDataSize()/16; // 16 bytes per event, number of bytes in 32bits
 
    if( event->GetLstVersion() == 1 ) {
       for( size_t i = 0; i + 3 < size/4; i += 4 ) {
@@ -91,7 +91,7 @@ int TILLDataParser::V1SingleFippsEventToFragment(uint32_t* data)
          TParsingDiagnostics::Get()->BadFragment(99);
       }
       Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
-      return 0;
+      return 1;
    }
    // Good event
    eventFrag->SetCharge(static_cast<int32_t>(Charge) );
@@ -122,7 +122,7 @@ int TILLDataParser::V2SingleFippsEventToFragment(uint32_t* data)
          TParsingDiagnostics::Get()->BadFragment(99);
       }
       Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
-      return 0;
+      return 1;
    }
    // Good event
    eventFrag->SetCharge(static_cast<int32_t>(Charge) );
