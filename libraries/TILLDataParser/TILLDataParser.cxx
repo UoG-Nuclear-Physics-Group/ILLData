@@ -32,7 +32,6 @@ int TILLDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
    // right now the parser only returns the total number of fragments read
    // so we assume (for now) that all fragments are good fragments
    int EventsProcessed = 0;
-   uint32_t NumberOfEventChunks = rawEvent->GetDataSize()/16;
    uint32_t size = event->GetDataSize();
    uint32_t* EvntData = reinterpret_cast<uint32_t*>(event->GetData());
 
