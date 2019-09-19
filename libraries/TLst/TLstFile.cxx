@@ -23,7 +23,7 @@
 #include "TILLMnemonic.h"
 #include "ILLDataVersion.h"
 
-#define READ_EVENT_SIZE 1000000
+#define READ_EVENT_SIZE 10000
 
 /// \cond CLASSIMP
 ClassImp(TLstFile)
@@ -122,6 +122,7 @@ bool TLstFile::Open(const char* filename)
 	TChannel::SetMnemonicClass(TILLMnemonic::Class());
 
    TRunInfo::SetRunInfo(GetRunNumber(), GetSubRunNumber());
+   TRunInfo::SetRunLength(300); 
    TRunInfo::ClearVersion();
    TRunInfo::SetVersion(ILLDATA_RELEASE);
 
@@ -157,8 +158,8 @@ int TLstFile::Read(std::shared_ptr<TRawEvent> Event)
 
    if(fBytesRead < fFileSize) {
       // Fill the buffer
+      char tempBuff[READ_EVENT_SIZE*4*sizeof(int32_t)] ; 
       try {
-         char* tempBuff = new char [READ_EVENT_SIZE*4*sizeof(int32_t)] ; 
          fInputStream.read( tempBuff, READ_EVENT_SIZE*4*sizeof(int32_t));
          LastReadSize = static_cast<size_t>(fInputStream.gcount());
          fBytesRead += LastReadSize;
@@ -168,7 +169,6 @@ int TLstFile::Read(std::shared_ptr<TRawEvent> Event)
             fReadBuffer.push_back(tempBuff[i]);
          }
 
-         delete tempBuff;
       } catch(std::exception& e) {
          std::cout<<"Caught "<<e.what() << " at " << __FILE__ << " : "  << __LINE__ <<std::endl;
       }
@@ -219,24 +219,7 @@ int TLstFile::GetRunNumber()
 
 int TLstFile::GetSubRunNumber()
 {
-   // Parse the sub run number from the current TMidasFile. This assumes a format of
-   // run#####_###.lst or run#####.lst.
-   if(fFilename.length() == 0) {
-      return -1;
-   }
-   std::size_t foundslash = fFilename.rfind('/');
-   std::size_t found      = fFilename.rfind('-');
-   if((found < foundslash && foundslash != std::string::npos) || found == std::string::npos) {
-      found = fFilename.rfind('_');
-   }
-   if(found < foundslash && foundslash != std::string::npos) {
-      found = std::string::npos;
-   }
-   if(found != std::string::npos) {
-      std::string temp = fFilename.substr(found + 1, 3);
-      // printf("%i \n",atoi(temp.c_str()));
-      return atoi(temp.c_str());
-   }
+   // There are no subruns in .lst files
    return -1;
 }
 
