@@ -33,3 +33,5 @@ In order to match the GRIFFIN clover colors to the FIPPS clover numbers the foll
 | 3                  | Green          |
 
 If the stated rules are followed, there should be a 1-to-1 relationship between the GRIFFIN crystals and FIPPS crystals from the targets frame of reference. 
+
+To compile simply call ```make``` from inside the ILLData directory.
