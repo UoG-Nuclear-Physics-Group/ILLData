@@ -132,14 +132,23 @@ void TFipps::Copy(TObject& rhs) const
    // Copy function.
    TSuppressed::Copy(rhs);
 
-   static_cast<TFipps&>(rhs).fAddbackHits  = fAddbackHits;
-   static_cast<TFipps&>(rhs).fAddbackFrags = fAddbackFrags;
+   static_cast<TFipps&>(rhs).fAddbackHits.clear();
+   static_cast<TFipps&>(rhs).fAddbackFrags.clear();
+   static_cast<TFipps&>(rhs).fSuppressedHits.clear();
+   static_cast<TFipps&>(rhs).fSuppressedAddbackHits.clear();
+   static_cast<TFipps&>(rhs).fSuppressedAddbackFrags.clear();
    static_cast<TFipps&>(rhs).fFippsBits    = 0;
 }
 
 TFipps::~TFipps()
 {
    // Default Destructor
+
+   // fHits automatically deleted in TDetector
+   for( auto hit : fAddbackHits ) delete hit;
+   for( auto hit : fSuppressedHits ) delete hit;
+   for( auto hit : fSuppressedAddbackHits ) delete hit;
+
 }
 
 void TFipps::Clear(Option_t* opt)
@@ -147,8 +156,17 @@ void TFipps::Clear(Option_t* opt)
    // Clears the mother, and all of the hits
    ClearStatus();
    TSuppressed::Clear(opt);
+
+
+   for( auto hit : fAddbackHits ) delete hit;
+   for( auto hit : fSuppressedHits ) delete hit;
+   for( auto hit : fSuppressedAddbackHits ) delete hit;
+
    fAddbackHits.clear();
+   fSuppressedHits.clear();
+   fSuppressedAddbackHits.clear();
    fAddbackFrags.clear();
+   fSuppressedAddbackFrags.clear();
 }
 
 void TFipps::Print(Option_t*) const
