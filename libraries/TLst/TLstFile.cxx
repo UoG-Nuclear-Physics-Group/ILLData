@@ -1,4 +1,5 @@
 #include <iostream>
+#include <bitset>
 #include <fstream>
 #include <cstdio>
 #include <cstring>
@@ -21,6 +22,8 @@
 #include "TILLDetectorInformation.h"
 #include "TILLMnemonic.h"
 #include "ILLDataVersion.h"
+
+#define READ_EVENT_SIZE 10000
 
 /// \cond CLASSIMP
 ClassImp(TLstFile)
@@ -46,7 +49,7 @@ TLstFile::~TLstFile()
 {
    // Default dtor. It closes the read in lst file as well as the output lst file.
    if( fBoardHeaders != nullptr )
-       delete fBoardHeaders;
+       delete[] fBoardHeaders;
    Close();
 }
 
@@ -85,49 +88,41 @@ bool TLstFile::Open(const char* filename)
    //int32_t* boardHeaders = new int32_t[nbBoards]
 
    try {
-      std::ifstream in(GetFilename(), std::ifstream::in | std::ifstream::binary);
-      in.seekg(0, std::ifstream::end);
-      if(in.tellg() < 0) {
+      fInputStream.open(GetFilename(), std::ifstream::in | std::ifstream::binary);
+      fInputStream.seekg(0, std::ifstream::end);
+      if(fInputStream.tellg() < 0) {
          std::cout<<R"(Failed to open ")"<<GetFilename()<<"/"<<fFilename<<R"("!)"<<std::endl;
          return false;
       }
-      fFileSize = in.tellg();
+      fFileSize = fInputStream.tellg();
 
       // Read Header Information
-      in.seekg(0, std::ifstream::beg);
+      fInputStream.seekg(0, std::ifstream::beg);
       
-      in.read(reinterpret_cast<char *>(&fVersion), sizeof(int32_t));
-      in.read(reinterpret_cast<char *>(&fTimeBase), sizeof(int32_t));
-      in.read(reinterpret_cast<char *>(&fnbEvents), sizeof(int32_t));
-      in.read(reinterpret_cast<char *>(&fnbBoards), sizeof(int32_t));
+      fInputStream.read(reinterpret_cast<char *>(&fVersion), sizeof(int32_t));
+      fInputStream.read(reinterpret_cast<char *>(&fTimeBase), sizeof(int32_t));
+      fInputStream.read(reinterpret_cast<char *>(&fnbEvents), sizeof(int32_t));
+      fInputStream.read(reinterpret_cast<char *>(&fnbBoards), sizeof(int32_t));
       headerSize += 4*4; // 4 chucks of 4 Bytes
 
       // Read Board Headers
       fBoardHeaders = new int32_t[fnbBoards];
-      in.read(reinterpret_cast<char *>(fBoardHeaders), fnbBoards * sizeof(uint32_t));
+      fInputStream.read(reinterpret_cast<char *>(fBoardHeaders), fnbBoards * sizeof(uint32_t));
       headerSize += 4*fnbBoards;
 
-      // Read rest of bytes into event buffer
-      fReadBuffer.resize(fFileSize - headerSize);
-      in.seekg(headerSize, std::ifstream::beg);
-      in.read(fReadBuffer.data(), fFileSize);
-      in.close();
+      fReadBuffer.reserve(READ_EVENT_SIZE*4*sizeof(int32_t));
+      fReadBuffer.resize(READ_EVENT_SIZE*4*sizeof(int32_t));
+      fInputStream.seekg(headerSize, std::ifstream::beg);
 
    } catch(std::exception& e) {
-      std::cout<<"Caught "<<e.what()<<std::endl;
+      std::cout<<"Caught "<<e.what() << " at " << __FILE__ << " : "  << __LINE__ <<std::endl;
    }
-   // Do we need these?
-   // signal(SIGPIPE,SIG_IGN); // crash if reading from closed pipe
-   // signal(SIGXFSZ,SIG_IGN); // crash if reading from file >2GB without O_LARGEFILE
-
-#ifndef O_LARGEFILE
-#define O_LARGEFILE 0
-#endif
 
 	// setup TChannel to use our mnemonics
 	TChannel::SetMnemonicClass(TILLMnemonic::Class());
 
    TRunInfo::SetRunInfo(GetRunNumber(), GetSubRunNumber());
+   TRunInfo::SetRunLength(300); 
    TRunInfo::ClearVersion();
    TRunInfo::SetVersion(ILLDATA_RELEASE);
 
@@ -141,23 +136,47 @@ bool TLstFile::Open(const char* filename)
 
 void TLstFile::Close()
 {
+   fInputStream.close();
 }
 
-/// \param [in] lstEvent Pointer to an empty TLstEvent
+/// \param [in] Event Pointer to an empty TLstEvent
 /// \returns "true" for success, "false" for failure, see GetLastError() to see why
 ///
 ///  EDITED FROM THE ORIGINAL TO RETURN TOTAL SUCESSFULLY BYTES READ INSTEAD OF TRUE/FALSE,  PCB
 ///
-int TLstFile::Read(std::shared_ptr<TRawEvent> lstEvent)
+int TLstFile::Read(std::shared_ptr<TRawEvent> Event)
 {
+   if( Event == nullptr )
+      return -1;
+
+   size_t LastReadSize = 0;
+   std::shared_ptr<TLstEvent> LstEvent = std::static_pointer_cast<TLstEvent>(Event);
+   LstEvent->Clear();
+
+   LstEvent->SetLstVersion(fVersion);
+
+
    if(fBytesRead < fFileSize) {
+      // Fill the buffer
+      char tempBuff[READ_EVENT_SIZE*4*sizeof(int32_t)] ; 
       try {
-         std::static_pointer_cast<TLstEvent>(lstEvent)->SetData(fReadBuffer);
+         fInputStream.read( tempBuff, READ_EVENT_SIZE*4*sizeof(int32_t));
+         LastReadSize = static_cast<size_t>(fInputStream.gcount());
+         fBytesRead += LastReadSize;
+
+         fReadBuffer.clear();
+         for(size_t i = 0; i < LastReadSize; i++) {
+            fReadBuffer.push_back(tempBuff[i]);
+         }
+
       } catch(std::exception& e) {
-         std::cout<<e.what()<<std::endl;
+         std::cout<<"Caught "<<e.what() << " at " << __FILE__ << " : "  << __LINE__ <<std::endl;
       }
-      fBytesRead = fFileSize;
-      return fFileSize;
+
+      // Write data to event
+      LstEvent->SetData(fReadBuffer);
+
+      return LastReadSize;
    }
    return 0;
 }
@@ -200,24 +219,7 @@ int TLstFile::GetRunNumber()
 
 int TLstFile::GetSubRunNumber()
 {
-   // Parse the sub run number from the current TMidasFile. This assumes a format of
-   // run#####_###.lst or run#####.lst.
-   if(fFilename.length() == 0) {
-      return -1;
-   }
-   std::size_t foundslash = fFilename.rfind('/');
-   std::size_t found      = fFilename.rfind('-');
-   if((found < foundslash && foundslash != std::string::npos) || found == std::string::npos) {
-      found = fFilename.rfind('_');
-   }
-   if(found < foundslash && foundslash != std::string::npos) {
-      found = std::string::npos;
-   }
-   if(found != std::string::npos) {
-      std::string temp = fFilename.substr(found + 1, 3);
-      // printf("%i \n",atoi(temp.c_str()));
-      return atoi(temp.c_str());
-   }
+   // There are no subruns in .lst files
    return -1;
 }
 

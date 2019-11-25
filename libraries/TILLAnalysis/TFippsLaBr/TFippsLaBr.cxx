@@ -12,8 +12,8 @@ ClassImp(TFippsLaBr)
 bool DefaultLaBrSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit)
 {
 	return ((hit->GetDetector() == bgoHit->GetDetector()) &&
-	(std::fabs(hit->GetTime() - bgoHit->GetTime()) < TGRSIOptions::AnalysisOptions()->SuppressionWindow()) &&
-	(bgoHit->GetEnergy() > TGRSIOptions::AnalysisOptions()->SuppressionEnergy()));
+        (std::fabs(hit->GetTime() - bgoHit->GetTime()) < TGRSIOptions::AnalysisOptions()->SuppressionWindow()) &&
+        (bgoHit->GetEnergy() > TGRSIOptions::AnalysisOptions()->SuppressionEnergy()));
 }
 
 std::function<bool(const TDetectorHit*, const TDetectorHit*)> TFippsLaBr::fSuppressionCriterion = DefaultLaBrSuppression;
@@ -43,6 +43,7 @@ TFippsLaBr::TFippsLaBr()
 TFippsLaBr::~TFippsLaBr()
 {
 	// Default Destructor
+    for( auto hit : fSuppressedHits ) delete hit;
 }
 
 TFippsLaBr::TFippsLaBr(const TFippsLaBr& rhs) : TSuppressed()
@@ -58,6 +59,7 @@ void TFippsLaBr::Clear(Option_t* opt)
 {
 	// Clears all of the hits
 	TSuppressed::Clear(opt);
+    for( auto hit : fSuppressedHits ) delete hit;
 	fSuppressedHits.clear();
 	fLaBrBits = 0;
 }
@@ -67,8 +69,11 @@ void TFippsLaBr::Copy(TObject& rhs) const
 	// Copies a TFippsLaBr
 	TSuppressed::Copy(rhs);
 
-	static_cast<TFippsLaBr&>(rhs).fSuppressedHits = fSuppressedHits;
-   static_cast<TFippsLaBr&>(rhs).fLaBrBits       = 0;
+    static_cast<TFippsLaBr&>(rhs).fSuppressedHits.resize(fSuppressedHits.size());
+    for( size_t i = 0; i < fSuppressedHits.size(); ++i) {
+        static_cast<TFippsLaBr&>(rhs).fSuppressedHits[i] = new TFippsLaBrHit(*static_cast<TFippsLaBrHit*>(fSuppressedHits[i]));
+    }
+    static_cast<TFippsLaBr&>(rhs).fLaBrBits       = 0;
 }
 
 TFippsLaBr& TFippsLaBr::operator=(const TFippsLaBr& rhs)
@@ -95,8 +100,9 @@ void TFippsLaBr::SetSuppressed(const bool flag)
 
 void TFippsLaBr::ResetSuppressed()
 {
-   SetSuppressed(false);
-   fSuppressedHits.clear();
+    SetSuppressed(false);
+    for( auto hit : fSuppressedHits ) delete hit;
+    fSuppressedHits.clear();
 }
 
 Short_t TFippsLaBr::GetSuppressedMultiplicity(const TBgo* bgo)
@@ -110,8 +116,13 @@ Short_t TFippsLaBr::GetSuppressedMultiplicity(const TBgo* bgo)
       fSuppressedHits.clear();
    }
    if(fSuppressedHits.empty()) {
-		CreateSuppressed(bgo, fHits, fSuppressedHits);
-      SetSuppressed(true);
+       if(!IsSuppressed()) {
+            for( auto hit : fSuppressedHits ) delete hit;
+            fSuppressedHits.clear();
+       }
+       
+       CreateSuppressed(bgo, fHits, fSuppressedHits);
+       SetSuppressed(true);
    }
 
    return fSuppressedHits.size();
@@ -122,8 +133,8 @@ TFippsLaBrHit* TFippsLaBr::GetSuppressedHit(const int& i)
 	try {
 		return static_cast<TFippsLaBrHit*>(fSuppressedHits.at(i));
 	} catch(const std::out_of_range& oor) {
-		std::cerr<<ClassName()<<" is out of range: "<<oor.what()<<std::endl;
-      throw grsi::exit_exception(1);
+        std::cerr<<ClassName()<<" is out of range: "<<oor.what()<<std::endl;
+        throw grsi::exit_exception(1);
    }
 	return nullptr;
 }

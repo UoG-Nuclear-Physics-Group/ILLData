@@ -13,7 +13,14 @@ Other classes included are:
  - TILLDetectorInformation, which only provides functions to tell whether FIPPS data is present (which should be all the time), and
  - TILLDetectorHit, which implemements the algorithm for how to get the time in nanoseconds from the timestamp and CFD information.
 
+## Installation
+
+To compile simply call ```make``` from inside the ILLData directory.
+
+Tested with GRSISort ```v4.0.0.1``` and ROOT ```v16.18/04```.
+
 ## Cal Information
+
 
 The most of the detector nomenclature of ILLData follows the [GRSI wiki](https://grsi.wiki.triumf.ca/index.php/Detector_Nomenclature). The exceptions are:
  - **FI** denotes the TFipps system
@@ -33,5 +40,3 @@ In order to match the GRIFFIN clover colors to the FIPPS clover numbers the foll
 | 3                  | Green          |
 
 If the stated rules are followed, there should be a 1-to-1 relationship between the GRIFFIN crystals and FIPPS crystals from the targets frame of reference. 
-
-To compile simply call ```make``` from inside the ILLData directory.
