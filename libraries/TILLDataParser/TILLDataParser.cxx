@@ -74,12 +74,15 @@ int TILLDataParser::V1SingleFippsEventToFragment(uint32_t* data)
       case EDigitizer::kV1724: 
          tmpTimestamp = tmpTimestamp<<30;
          tmpTimestamp |= data[1] & 0x3ffffffF; // 30 bit timestamp
+			break;
       case EDigitizer::kV1725_PHA:
          tmpTimestamp = tmpTimestamp<<31;
          tmpTimestamp |= data[1] & 0x7ffffffF; // 31 bit timestamp
+			break;
       default:
          tmpTimestamp = tmpTimestamp<<32;
          tmpTimestamp |= data[1] & 0xffffffff; // 32 bit timestamp
+			break;
    }
    eventFrag->SetTimeStamp(tmpTimestamp);
 
