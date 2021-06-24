@@ -7,10 +7,10 @@ PLATFORM:=$(shell uname)
 # EDIT THIS SECTION
 
 INCLUDES   = include 
-CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unknown-pragmas -Wno-unused-function -Wshadow
+CFLAGS     = -g -O3 -Wall -Wextra -pedantic -Wno-unknown-pragmas -Wno-unused-function -Wshadow
 #-Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =
-LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11
+LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm
 SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
@@ -88,9 +88,9 @@ INCLUDES  := $(addprefix -I$(CURDIR)/,$(INCLUDES)) -I$(shell grsi-config --incdi
 CFLAGS    += $(shell grsi-config --cflags)
 CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
-LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT -lMinuit -lGuiHtml -lTreePlayer -lX11 -lXpm -lProof -lTMVA
+LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lMinuit -lGuiHtml -lTreePlayer -lX11 -lXpm -lProof -lTMVA
 LINKFLAGS += $(shell grsi-config --all-libs)
-LINKFLAGS += -Llib -lILLData -Wl,-rpath,\$$ORIGIN/../lib
+LINKFLAGS += $(shell grsi-config --ILLData-libs)
 
 # RCFLAGS are being used for rootcint
 ifeq ($(MATHMORE_INSTALLED),yes)
@@ -113,7 +113,7 @@ GRSI_LIBFLAGS := $(shell grsi-config --cflags --libs)
 UTIL_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard util/*.$(SRC_SUFFIX)))
 MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_SUFFIX)))
 EXE_O_FILES     := $(UTIL_O_FILES)
-EXECUTABLES     := $(patsubst %.o,$(GRSISYS)/bin/%,$(notdir $(EXE_O_FILES)))
+EXECUTABLES     := $(patsubst %.o,bin/%,$(notdir $(EXE_O_FILES)))
 
 HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
 FILTER_SO    := $(patsubst filters/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard filters/*.$(SRC_SUFFIX)))
@@ -138,7 +138,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/ILLDataVersion.h $(LIBRARY_OUTPUT) lib/libILLData.so $(HISTOGRAM_SO) 
+all: include/ILLDataVersion.h $(LIBRARY_OUTPUT) lib/libILLData.so $(HISTOGRAM_SO) $(EXECUTABLES)
 	@$(FIND) .build -name "*.pcm" -exec cp {} lib/ \;
 	@$(FIND) .build -name "*.rootmap" -exec cp {} lib/ \;
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
@@ -149,7 +149,10 @@ docs: doxygen
 doxygen:
 	$(MAKE) -C $@
 
-lib: include/ILLDataVersion.h
+bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin include/ILLDataVersion.h
+	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+
+bin lib:
 	@mkdir -p $@
 
 include/ILLDataVersion.h:
@@ -174,7 +177,6 @@ find_linkdef = $(shell $(FIND) $(1) -name "*LinkDef.h")
 # In order for all function names to be unique, rootcint requires unique output names.
 # Therefore, usual wildcard rules are insufficient.
 # Eval is more powerful, but is less convenient to use.
-	#$$(call run_and_test,$$(ROOTCINT) -f $$@ -c $$(INCLUDES) $$(RCFLAGS) -s .build/$(1)/$(notdir $(1)) -multiDict -rml libGRSI.so -rmf .build/$(1)/$(notdir $(1)).rootmap -p $$(notdir $$(filter-out $$<,$$^)) $$<,$$@,$$(COM_COLOR),$$(BLD_STRING) ,$$(OBJ_COLOR))
 define library_template
 .build/$(1)/$(notdir $(1))Dict.cxx: $(1)/LinkDef.h $$(call dict_header_files,$(1)/LinkDef.h) 
 	@mkdir -p $$(dir $$@)
