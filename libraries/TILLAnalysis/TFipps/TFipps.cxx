@@ -552,3 +552,14 @@ void TFipps::FixCrossTalk()
    }
    SetCrossTalk(true);
 }
+
+const char* TFipps::GetColorFromNumber(int number)
+{
+	switch(number) {
+		case 0: return "R";
+		case 1: return "W";
+		case 2: return "B";
+		case 3: return "G";
+	}
+	return "X";
+}

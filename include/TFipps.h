@@ -50,6 +50,7 @@ public:
    TDetectorHit* GetFippsHit(const Int_t& i);
 
    static TVector3 GetPosition(int DetNbr, int CryNbr = 5, double dist = 90.0); //!<!
+   static const char* GetColorFromNumber(int number);
 #ifndef __CINT__
    void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
 #endif
@@ -146,7 +147,7 @@ public:
    void Print(Option_t* opt = "") const override; //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TFipps, 6) // Fipps Physics structure
+   ClassDefOverride(TFipps, 7) // Fipps Physics structure
    /// \endcond
 };
 /*! @} */
