@@ -87,36 +87,53 @@ int main(int argc, char** argv) {
 		str<<"N00X";
 		//std::cout<<"final - "<<str.str()<<std::endl;
 		channel = new TChannel(str.str().c_str());
-		channel->SetAddress(adc);
+		channel->SetAddress((adc/16)*0x40+adc%16);
 		channel->SetNumber(TPriorityValue<int>(globId+1, EPriority::kForce));
 		channel->SetTimeOffset(TPriorityValue<Long64_t>(-timeOffset, EPriority::kForce));
+		channel->SetDigitizerType(TPriorityValue<std::string>("V1725", EPriority::kForce));
 		TChannel::AddChannel(channel);
 		//channel->Print();
 	}
 
 	//////////////////////////////////////// energy calibration ////////////////////////////////////////
-	double a0;
-	double a1;
-	double a2;
-	double a3;
+	Float_t tmpFloat;
+	std::vector<Float_t> coefficients;
 	int minRange;
 	int maxRange;
 	for(int i = 2; i < argc-1; ++i) {
 		std::ifstream calFile(argv[i]);
 		while(std::getline(calFile, line)) {
+			// erase all trailing whitespace
+			line.erase(std::find_if(line.rbegin(), line.rend(), [](int ch) { return !std::isspace(ch); }).base(), line.end());
+
 			if(line.empty() || std::all_of(line.begin(), line.end(), [](char c){ return std::isspace(c); }) || line[0] == '#') continue;
 
 			str.clear();
 			str.str(line);
-			str>>globId>>a0>>a1>>a2>>a3>>minRange>>maxRange;
+			str>>globId;
 			channel = TChannel::GetChannelByNumber(globId+1);
 			if(channel != nullptr) {
-				channel->DestroyENGCal();
-				channel->AddENGCoefficient(a0);
-				channel->AddENGCoefficient(a1);
-				channel->AddENGCoefficient(a2);
-				channel->AddENGCoefficient(a3);
-				//std::cout<<"Set energy coefficients for channel "<<globId+1<<" - "<<channel->GetMnemonic()->SystemString()<<channel->GetMnemonic()->SubSystemString()<<channel->GetMnemonic()->ArrayPosition()<<std::endl;
+				if(i == 2) {
+					channel->DestroyENGCal();
+					channel->ResizeENG(argc-3); // -3 = program itself, LUT file, and cross talk file
+					//std::cout<<"resized ENG to "<<argc-3<<" - "<<channel->GetMnemonic()->GetName()<<std::endl;
+				}
+				//std::cout<<"Setting "<<i-2<<" energy coefficients for channel "<<globId+1<<" - "<<channel->GetMnemonic()->GetName()<<std::endl;
+				//std::cout<<"From line \""<<line<<"\": "<<std::endl;
+				while(str.good()) {
+					str>>tmpFloat;
+					coefficients.push_back(tmpFloat);
+				}
+				//for(auto val : coefficients) std::cout<<val<<"\t";
+				//std::cout<<std::endl;
+				maxRange = coefficients.back();
+				coefficients.pop_back();
+				minRange = coefficients.back();
+				coefficients.pop_back();
+				channel->SetENGCoefficients(coefficients, i-2);
+				coefficients.clear();
+				//std::cout<<minRange<<"-"<<maxRange<<std::endl;
+				channel->SetENGRange(std::make_pair(minRange, maxRange), i-2);
 			} else {
 				std::cerr<<"Failed to find detector ID "<<globId+1<<" in TChannel"<<std::endl;
 			}
@@ -150,7 +167,7 @@ int main(int argc, char** argv) {
 			}
 			channel->DestroyCTCal();
 			
-			//std::cout<<"destroyed cross talk coefficients for channel "<<channel->GetMnemonic()->SystemString()<<channel->GetMnemonic()->SubSystemString()<<std::setw(2)<<channel->GetMnemonic()->ArrayPosition()<<TFipps::GetColorFromNumber(channel->GetMnemonic()->Segment())<<std::endl;
+			//std::cout<<"destroyed cross talk coefficients for channel "<<channel->GetMnemonic()->GetName()<<std::endl;
 		}
 		channel->AddCTCoefficient(val);
 		if(col == 3 && row == 3) ++detNumber;
