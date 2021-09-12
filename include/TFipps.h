@@ -47,7 +47,7 @@ public:
    ~TFipps() override;
 
 public:
-   TDetectorHit* GetFippsHit(const Int_t& i);
+   TFippsHit* GetFippsHit(const Int_t& i);
 
    static TVector3 GetPosition(int DetNbr, int CryNbr = 5, double dist = 90.0); //!<!
    static const char* GetColorFromNumber(int number);
@@ -68,17 +68,17 @@ public:
    bool AddbackCriterion(const TDetectorHit* hit1, const TDetectorHit* hit2) override { return fAddbackCriterion(hit1, hit2); }
 #endif
 
-   Int_t         GetAddbackMultiplicity();
-   TDetectorHit* GetAddbackHit(const int& i);
-   bool          IsAddbackSet() const;
-   void          ResetAddback();
-   void          ResetSuppressed();
-   void          ResetSuppressedAddback();
-   UShort_t      GetNAddbackFrags(const size_t& idx);
+   Int_t      GetAddbackMultiplicity();
+   TFippsHit* GetAddbackHit(const int& i);
+   bool       IsAddbackSet() const;
+   void       ResetAddback();
+   void       ResetSuppressed();
+   void       ResetSuppressedAddback();
+   UShort_t   GetNAddbackFrags(const size_t& idx);
 
-   TDetectorHit*    GetSuppressedHit(const int& i);
-   Int_t         GetSuppressedMultiplicity( const TBgo* bgo );
-   bool          IsSuppressed() const;
+   TFippsHit* GetSuppressedHit(const int& i);
+   Int_t      GetSuppressedMultiplicity( const TBgo* bgo );
+   bool       IsSuppressed() const;
 
 #if !defined(__CINT__) && !defined(__CLING__)
    void SetSuppressionCriterion(std::function<bool(const TDetectorHit*, const TDetectorHit*)> criterion)
@@ -90,7 +90,7 @@ public:
    bool SuppressionCriterion(const TDetectorHit* hit, const TDetectorHit* bgoHit) override { return fSuppressionCriterion(hit, bgoHit); }
 #endif
 
-   TDetectorHit*    GetSuppressedAddbackHit( const int& i );
+   TFippsHit* GetSuppressedAddbackHit(const int& i);
    Int_t            GetSuppressedAddbackMultiplicity(const TBgo* bgo);
    bool IsSuppressedAddbackSet() const;
 
@@ -121,9 +121,6 @@ private:
 
    // Cross-Talk stuff
 public:
-   static const Double_t gStrongCT[2];           //!<!
-   static const Double_t gWeakCT[2];             //!<!
-   static const Double_t gCrossTalkPar[2][4][4]; //!<!
    static Double_t CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const TFippsHit* const other_hit,
                                      Bool_t time_constraint = true);
    Bool_t IsCrossTalkSet() const;

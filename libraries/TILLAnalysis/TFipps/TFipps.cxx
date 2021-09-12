@@ -97,18 +97,6 @@ TVector3 TFipps::gCloverPosition[17] = {
             TMath::Cos(TMath::DegToRad() * (135.0))) // G: 14 F: 15
             };
 
-// Cross Talk stuff
-const Double_t TFipps::gStrongCT[2]           = {-0.02674, -0.000977}; // This is for the 0-1 and 2-3 combination
-const Double_t TFipps::gWeakCT[2]             = {0.005663, -0.00028014};
-const Double_t TFipps::gCrossTalkPar[2][4][4] = {{{0.0, gStrongCT[0], gWeakCT[0], gWeakCT[0]},
-                                                  {gStrongCT[0], 0.0, gWeakCT[0], gWeakCT[0]},
-                                                  {gWeakCT[0], gWeakCT[0], 0.0, gStrongCT[0]},
-                                                  {gWeakCT[0], gWeakCT[0], gStrongCT[0], 0.0}},
-                                                 {{0.0, gStrongCT[1], gWeakCT[1], gWeakCT[1]},
-                                                  {gStrongCT[1], 0.0, gWeakCT[1], gWeakCT[1]},
-                                                  {gWeakCT[1], gWeakCT[1], 0.0, gStrongCT[1]},
-                                                  {gWeakCT[1], gWeakCT[1], gStrongCT[1], 0.0}}};
-
 TFipps::TFipps() : TSuppressed()
 {
 // Default ctor. Ignores TObjectStreamer in ROOT < 6
@@ -257,13 +245,13 @@ void TFipps::SetSuppressedAddback(const Bool_t flag) const
     return SetBitNumber(EFippsBits::kIsSuppressedAddbackSet, flag);
 }
 
-TDetectorHit* TFipps::GetFippsHit(const int& i)
+TFippsHit* TFipps::GetFippsHit(const int& i)
 {
    try {
       if(!IsCrossTalkSet()) {
          FixCrossTalk();
       }
-      return fHits.at(i);
+      return static_cast<TFippsHit*>(fHits.at(i));
    } catch(const std::out_of_range& oor) {
       std::cerr<<ClassName()<<" Hits are out of range: "<<oor.what()<<std::endl;
       if(!gInterpreter) {
@@ -273,13 +261,13 @@ TDetectorHit* TFipps::GetFippsHit(const int& i)
    return nullptr;
 }
 
-TDetectorHit* TFipps::GetSuppressedHit(const int& i)
+TFippsHit* TFipps::GetSuppressedHit(const int& i)
 {
     try {
         if(!IsCrossTalkSet()) {
             FixCrossTalk();
         }
-        return fSuppressedHits.at(i);
+        return static_cast<TFippsHit*>(fSuppressedHits.at(i));
    } catch(const std::out_of_range& oor) {
       std::cerr<<ClassName()<<"Suppressed hits are out of range: "<<oor.what()<<std::endl;
       if(!gInterpreter) {
@@ -371,13 +359,13 @@ Int_t TFipps::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
 }
 
 
-TDetectorHit* TFipps::GetAddbackHit(const int& i)
+TFippsHit* TFipps::GetAddbackHit(const int& i)
 {
    try{
        if(!IsCrossTalkSet()) {
            FixCrossTalk();
        }
-       return static_cast<TDetectorHit*>(GetAddbackVector().at(i));
+       return static_cast<TFippsHit*>(GetAddbackVector().at(i));
    } catch(const std::out_of_range& oor) {
        std::cerr<<ClassName()<<" Addback hits are out of range: "<<oor.what()<<std::endl;
        if(!gInterpreter) {
@@ -387,13 +375,13 @@ TDetectorHit* TFipps::GetAddbackHit(const int& i)
    return nullptr;
 }
 
-TDetectorHit* TFipps::GetSuppressedAddbackHit(const int& i)
+TFippsHit* TFipps::GetSuppressedAddbackHit(const int& i)
 {
    try{
        if(!IsCrossTalkSet()) {
            FixCrossTalk();
        }
-       return static_cast<TDetectorHit*>(GetSuppressedAddbackVector().at(i));
+       return static_cast<TFippsHit*>(GetSuppressedAddbackVector().at(i));
    } catch(const std::out_of_range& oor) {
        std::cerr<<ClassName()<<" Suppressed addback hits are out of range: "<<oor.what()<<std::endl;
        if(!gInterpreter) {
@@ -509,25 +497,42 @@ void TFipps::SetBitNumber(enum EFippsBits bit, Bool_t set) const
 Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const TFippsHit* const other_hit,
                                    Bool_t time_constraint)
 {
-   if((hit_to_correct == nullptr) || (other_hit == nullptr)) {
-      printf("One of the hits is invalid in TFipps::CTCorrectedEnergy\n");
-      return 0;
-   }
+	/// Corrects the energy of the hit to correct by ADDING the uncorrected energy of the other hit times the parameter for this combination
+	/// This is different to the very similar TGriffin function that SUBTRACTS instead of ADDING.
+	/// If time_constraint is true it also checks that the two hits are within the addback window to each other.
+	if((hit_to_correct == nullptr) || (other_hit == nullptr)) {
+		std::cerr<<"One of the hits is invalid in TFipps::CTCorrectedEnergy"<<std::endl;
+		return 0;
+	}
 
-   if(time_constraint) {
-      // Figure out if this passes the selected window
-      if(TMath::Abs(other_hit->GetTime() - hit_to_correct->GetTime()) >
-         TGRSIOptions::AnalysisOptions()->AddbackWindow()) { // placeholder
-         return hit_to_correct->GetEnergy();
-      }
-   }
+	if(time_constraint) {
+		// Figure out if this passes the selected window
+		if(TMath::Abs(other_hit->GetTime() - hit_to_correct->GetTime()) >
+				TGRSIOptions::AnalysisOptions()->AddbackWindow()) { // placeholder
+			return hit_to_correct->GetEnergy();
+		}
+	}
 
-   if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
-      return hit_to_correct->GetEnergy();
-   }
-   return hit_to_correct->GetEnergy() -
-          (gCrossTalkPar[0][hit_to_correct->GetCrystal()][other_hit->GetCrystal()] +
-           gCrossTalkPar[1][hit_to_correct->GetCrystal()][other_hit->GetCrystal()] * other_hit->GetNoCTEnergy());
+	if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
+		return hit_to_correct->GetEnergy();
+	}
+	static bool been_warned[256] = {false};
+	double      fixed_energy     = hit_to_correct->GetEnergy();
+	try {
+		if(hit_to_correct->GetChannel() != nullptr) {
+			fixed_energy += hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
+		}
+	} catch(const std::out_of_range& oor) {
+		int id = 16 * hit_to_correct->GetDetector() + 4 * hit_to_correct->GetCrystal() + other_hit->GetCrystal();
+		if(!been_warned[id]) {
+			been_warned[id] = true;
+			std::cerr<<DRED<<"Missing CT correction for Det: "<<hit_to_correct->GetDetector()
+				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<std::endl;
+		}
+		return hit_to_correct->GetEnergy();
+	}
+
+	return fixed_energy;
 }
 
 void TFipps::FixCrossTalk()
@@ -542,13 +547,12 @@ void TFipps::FixCrossTalk()
    }
 
    if(TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) {
-      size_t i, j;
-      for(i = 0; i < hit_vec.size(); ++i) {
-         for(j = i + 1; j < hit_vec.size(); ++j) {
-            hit_vec.at(i)->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(hit_vec.at(i)), static_cast<TFippsHit*>(hit_vec.at(j))));
-            hit_vec.at(j)->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(hit_vec.at(j)), static_cast<TFippsHit*>(hit_vec.at(i))));
-         }
-      }
+		for(auto& one : hit_vec) {
+			for(auto& two : hit_vec) {
+				if(one == two) continue;
+				one->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(one), static_cast<TFippsHit*>(two)));
+			}
+		}
    }
    SetCrossTalk(true);
 }

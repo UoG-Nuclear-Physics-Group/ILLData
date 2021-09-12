@@ -257,13 +257,13 @@ void TIfin::SetSuppressedAddback(const Bool_t flag) const
     return SetBitNumber(EIfinBits::kIsSuppressedAddbackSet, flag);
 }
 
-TDetectorHit* TIfin::GetIfinHit(const int& i)
+TIfinHit* TIfin::GetIfinHit(const int& i)
 {
    try {
       if(!IsCrossTalkSet()) {
          FixCrossTalk();
       }
-      return fHits.at(i);
+      return static_cast<TIfinHit*>(fHits.at(i));
    } catch(const std::out_of_range& oor) {
       std::cerr<<ClassName()<<" Hits are out of range: "<<oor.what()<<std::endl;
       if(!gInterpreter) {
@@ -273,13 +273,13 @@ TDetectorHit* TIfin::GetIfinHit(const int& i)
    return nullptr;
 }
 
-TDetectorHit* TIfin::GetSuppressedHit(const int& i)
+TIfinHit* TIfin::GetSuppressedHit(const int& i)
 {
     try {
         if(!IsCrossTalkSet()) {
             FixCrossTalk();
         }
-        return fSuppressedHits.at(i);
+        return static_cast<TIfinHit*>(fSuppressedHits.at(i));
    } catch(const std::out_of_range& oor) {
       std::cerr<<ClassName()<<"Suppressed hits are out of range: "<<oor.what()<<std::endl;
       if(!gInterpreter) {
@@ -371,13 +371,13 @@ Int_t TIfin::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
 }
 
 
-TDetectorHit* TIfin::GetAddbackHit(const int& i)
+TIfinHit* TIfin::GetAddbackHit(const int& i)
 {
    try{
        if(!IsCrossTalkSet()) {
            FixCrossTalk();
        }
-       return static_cast<TDetectorHit*>(GetAddbackVector().at(i));
+       return static_cast<TIfinHit*>(GetAddbackVector().at(i));
    } catch(const std::out_of_range& oor) {
        std::cerr<<ClassName()<<" Addback hits are out of range: "<<oor.what()<<std::endl;
        if(!gInterpreter) {
@@ -387,13 +387,13 @@ TDetectorHit* TIfin::GetAddbackHit(const int& i)
    return nullptr;
 }
 
-TDetectorHit* TIfin::GetSuppressedAddbackHit(const int& i)
+TIfinHit* TIfin::GetSuppressedAddbackHit(const int& i)
 {
    try{
        if(!IsCrossTalkSet()) {
            FixCrossTalk();
        }
-       return static_cast<TDetectorHit*>(GetSuppressedAddbackVector().at(i));
+       return static_cast<TIfinHit*>(GetSuppressedAddbackVector().at(i));
    } catch(const std::out_of_range& oor) {
        std::cerr<<ClassName()<<" Suppressed addback hits are out of range: "<<oor.what()<<std::endl;
        if(!gInterpreter) {
@@ -509,25 +509,42 @@ void TIfin::SetBitNumber(enum EIfinBits bit, Bool_t set) const
 Double_t TIfin::CTCorrectedEnergy(const TIfinHit* const hit_to_correct, const TIfinHit* const other_hit,
                                    Bool_t time_constraint)
 {
-   if((hit_to_correct == nullptr) || (other_hit == nullptr)) {
-      printf("One of the hits is invalid in TIfin::CTCorrectedEnergy\n");
-      return 0;
-   }
+	/// Corrects the energy of the hit to correct by ADDING the uncorrected energy of the other hit times the parameter for this combination
+	/// This is different to the very similar TGriffin function that SUBTRACTS instead of ADDING.
+	/// If time_constraint is true it also checks that the two hits are within the addback window to each other.
+	if((hit_to_correct == nullptr) || (other_hit == nullptr)) {
+		std::cerr<<"One of the hits is invalid in TIfin::CTCorrectedEnergy"<<std::endl;
+		return 0;
+	}
 
-   if(time_constraint) {
-      // Figure out if this passes the selected window
-      if(TMath::Abs(other_hit->GetTime() - hit_to_correct->GetTime()) >
-         TGRSIOptions::AnalysisOptions()->AddbackWindow()) { // placeholder
-         return hit_to_correct->GetEnergy();
-      }
-   }
+	if(time_constraint) {
+		// Figure out if this passes the selected window
+		if(TMath::Abs(other_hit->GetTime() - hit_to_correct->GetTime()) >
+				TGRSIOptions::AnalysisOptions()->AddbackWindow()) { // placeholder
+			return hit_to_correct->GetEnergy();
+		}
+	}
 
-   if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
-      return hit_to_correct->GetEnergy();
-   }
-   return hit_to_correct->GetEnergy() -
-          (gCrossTalkPar[0][hit_to_correct->GetCrystal()][other_hit->GetCrystal()] +
-           gCrossTalkPar[1][hit_to_correct->GetCrystal()][other_hit->GetCrystal()] * other_hit->GetNoCTEnergy());
+	if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
+		return hit_to_correct->GetEnergy();
+	}
+	static bool been_warned[256] = {false};
+	double      fixed_energy     = hit_to_correct->GetEnergy();
+	try {
+		if(hit_to_correct->GetChannel() != nullptr) {
+			fixed_energy += hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
+		}
+	} catch(const std::out_of_range& oor) {
+		int id = 16 * hit_to_correct->GetDetector() + 4 * hit_to_correct->GetCrystal() + other_hit->GetCrystal();
+		if(!been_warned[id]) {
+			been_warned[id] = true;
+			std::cerr<<DRED<<"Missing CT correction for Det: "<<hit_to_correct->GetDetector()
+				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<std::endl;
+		}
+		return hit_to_correct->GetEnergy();
+	}
+
+	return fixed_energy;
 }
 
 void TIfin::FixCrossTalk()
@@ -542,13 +559,12 @@ void TIfin::FixCrossTalk()
    }
 
    if(TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) {
-      size_t i, j;
-      for(i = 0; i < hit_vec.size(); ++i) {
-         for(j = i + 1; j < hit_vec.size(); ++j) {
-            hit_vec.at(i)->SetEnergy(TIfin::CTCorrectedEnergy(static_cast<TIfinHit*>(hit_vec.at(i)), static_cast<TIfinHit*>(hit_vec.at(j))));
-            hit_vec.at(j)->SetEnergy(TIfin::CTCorrectedEnergy(static_cast<TIfinHit*>(hit_vec.at(j)), static_cast<TIfinHit*>(hit_vec.at(i))));
-         }
-      }
+		for(auto& one : hit_vec) {
+			for(auto& two : hit_vec) {
+				if(one == two) continue;
+				one->SetEnergy(TIfin::CTCorrectedEnergy(static_cast<TIfinHit*>(one), static_cast<TIfinHit*>(two)));
+			}
+		}
    }
    SetCrossTalk(true);
 }
