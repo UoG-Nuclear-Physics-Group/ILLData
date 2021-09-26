@@ -98,10 +98,11 @@ int main(int argc, char** argv) {
 	//////////////////////////////////////// energy calibration ////////////////////////////////////////
 	Float_t tmpFloat;
 	std::vector<Float_t> coefficients;
-	int minRange;
-	int maxRange;
+	int minRange = 0;
+	int maxRange = 30000;
 	for(int i = 2; i < argc-1; ++i) {
 		std::ifstream calFile(argv[i]);
+		//std::cout<<"Opened energy calibration file '"<<argv[i]<<"' for range "<<i-2<<std::endl;
 		while(std::getline(calFile, line)) {
 			// erase all trailing whitespace
 			line.erase(std::find_if(line.rbegin(), line.rend(), [](int ch) { return !std::isspace(ch); }).base(), line.end());
@@ -126,14 +127,19 @@ int main(int argc, char** argv) {
 				}
 				//for(auto val : coefficients) std::cout<<val<<"\t";
 				//std::cout<<std::endl;
-				maxRange = coefficients.back();
-				coefficients.pop_back();
-				minRange = coefficients.back();
-				coefficients.pop_back();
+				// we only expect the last two columns to be the ranges if we have more than one cal-file
+				if(argc > 4) {
+					maxRange = coefficients.back();
+					coefficients.pop_back();
+					minRange = coefficients.back();
+					coefficients.pop_back();
+				}
 				channel->SetENGCoefficients(coefficients, i-2);
 				coefficients.clear();
+channel->Print();
 				//std::cout<<minRange<<"-"<<maxRange<<std::endl;
 				channel->SetENGRange(std::make_pair(minRange, maxRange), i-2);
+channel->Print();
 			} else {
 				std::cerr<<"Failed to find detector ID "<<globId+1<<" in TChannel"<<std::endl;
 			}
