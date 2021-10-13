@@ -141,6 +141,6 @@ TFippsLaBrHit* TFippsLaBr::GetSuppressedHit(const int& i)
 
 void TFippsLaBr::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
-	TFippsLaBrHit* laHit = new TFippsLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
-	fHits.push_back(std::move(laHit)); // use std::move for efficienciy since laHit loses scope here anyway
+	TFippsLaBrHit* hit = new TFippsLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
+	fHits.push_back(hit);
 }

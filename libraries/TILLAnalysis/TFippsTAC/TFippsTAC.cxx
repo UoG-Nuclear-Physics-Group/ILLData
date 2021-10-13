@@ -45,5 +45,5 @@ void TFippsTAC::Print(Option_t*) const
 void TFippsTAC::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 	TFippsTACHit* hit = new TFippsTACHit(*frag);
-	fHits.push_back(std::move(hit));
+	fHits.push_back(hit);
 }
