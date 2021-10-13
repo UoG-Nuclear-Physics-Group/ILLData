@@ -415,8 +415,8 @@ void TFipps::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*
    switch(chan->GetMnemonic()->SubSystem()) {
 		case TMnemonic::EMnemonic::kG: 
 			{
-				auto geHit = new TFippsHit(*frag);
-				fHits.push_back(std::move(geHit));
+				auto hit = new TFippsHit(*frag);
+				fHits.push_back(hit);
 			}
 			break;
 		default:
