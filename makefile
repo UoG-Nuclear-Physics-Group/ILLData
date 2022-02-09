@@ -149,7 +149,7 @@ docs: doxygen
 doxygen:
 	$(MAKE) -C $@
 
-bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/ILLDataVersion.h lib/libILLData.so
+$(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/ILLDataVersion.h lib/libILLData.so
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib: include/ILLDataVersion.h
