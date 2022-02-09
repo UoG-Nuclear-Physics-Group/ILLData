@@ -113,7 +113,7 @@ GRSI_LIBFLAGS := $(shell grsi-config --cflags --libs)
 UTIL_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard util/*.$(SRC_SUFFIX)))
 MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_SUFFIX)))
 EXE_O_FILES     := $(UTIL_O_FILES)
-EXECUTABLES     := $(patsubst %.o,bin/%,$(notdir $(EXE_O_FILES)))
+EXECUTABLES     := $(patsubst %.o,$(GRSISYS)/bin/%,$(notdir $(EXE_O_FILES)))
 
 HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
 FILTER_SO    := $(patsubst filters/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard filters/*.$(SRC_SUFFIX)))
@@ -149,10 +149,10 @@ docs: doxygen
 doxygen:
 	$(MAKE) -C $@
 
-bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin include/ILLDataVersion.h
+bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/ILLDataVersion.h lib/libILLData.so
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-bin lib:
+lib: include/ILLDataVersion.h
 	@mkdir -p $@
 
 include/ILLDataVersion.h:
@@ -200,6 +200,7 @@ html: all
 clean:
 	@printf "\n$(WARN_COLOR)Cleaning up$(NO_COLOR)\n\n"
 	@-$(RM) -rf .build lib
+	@-$(RM) -f $(EXECUTABLES)
 	@-$(RM) -rf libraries/*.so libraries/*.pcm #this is here for cleaning up libraries from pre GRSI 3.0
 
 cleaner: clean
