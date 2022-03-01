@@ -510,7 +510,7 @@ Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const 
                                    Bool_t time_constraint)
 {
    if((hit_to_correct == nullptr) || (other_hit == nullptr)) {
-      printf("One of the hits is invalid in TFipps::CTCorrectedEnergy\n");
+		std::cout<<"One of the hits is invalid in TFipps::CTCorrectedEnergy"<<std::endl;
       return 0;
    }
 
@@ -532,22 +532,20 @@ Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const 
 
 void TFipps::FixCrossTalk()
 {
+   if(!TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) return;
+
    auto hit_vec = GetHitVector();
    if(hit_vec.size() < 2) {
       SetCrossTalk(true);
       return;
    }
-   for(auto& i : hit_vec) {
-      i->ClearEnergy();
+   for(auto& hit : hit_vec) {
+      static_cast<TFippsHit*>(hit)->ClearEnergy();
    }
 
-   if(TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) {
-      size_t i, j;
-      for(i = 0; i < hit_vec.size(); ++i) {
-         for(j = i + 1; j < hit_vec.size(); ++j) {
-            hit_vec.at(i)->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(hit_vec.at(i)), static_cast<TFippsHit*>(hit_vec.at(j))));
-            hit_vec.at(j)->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(hit_vec.at(j)), static_cast<TFippsHit*>(hit_vec.at(i))));
-         }
+	for(auto& one : hit_vec) {
+		for(auto& two : hit_vec) {
+			one->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(one), static_cast<TFippsHit*>(two));
       }
    }
    SetCrossTalk(true);
