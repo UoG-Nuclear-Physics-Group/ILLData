@@ -9,7 +9,7 @@ ClassImp(TFippsHit)
 /// \endcond
 
 TFippsHit::TFippsHit()
-	: TILLDetectorHit()
+	: TDetectorHit()
 {
 	// Default Ctor. Ignores TObject Streamer in ROOT < 6.
 #if MAJOR_ROOT_VERSION < 6
@@ -18,14 +18,14 @@ TFippsHit::TFippsHit()
 	Clear();
 }
 
-TFippsHit::TFippsHit(const TFippsHit& rhs) : TILLDetectorHit()
+TFippsHit::TFippsHit(const TFippsHit& rhs) : TDetectorHit()
 {
 	// Copy Ctor. Ignores TObject Streamer in ROOT < 6.
 	Clear();
 	rhs.Copy(*this);
 }
 
-TFippsHit::TFippsHit(const TFragment& frag) : TILLDetectorHit(frag)
+TFippsHit::TFippsHit(const TFragment& frag) : TDetectorHit(frag)
 {
 }
 
@@ -33,7 +33,7 @@ TFippsHit::~TFippsHit() = default;
 
 void TFippsHit::Copy(TObject& rhs) const
 {
-	TILLDetectorHit::Copy(rhs);
+	TDetectorHit::Copy(rhs);
 }
 
 void TFippsHit::Copy(TObject& obj, bool) const
@@ -44,7 +44,7 @@ void TFippsHit::Copy(TObject& obj, bool) const
 void TFippsHit::Clear(Option_t* opt)
 {
 	// Clears the information stored in the TFippsHit.
-	TILLDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+	TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
 }
 
 void TFippsHit::Print(Option_t*) const

@@ -23,14 +23,14 @@
 
 #include "TVector3.h"
 
-#include "TILLDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TFippsTACHit : public TILLDetectorHit {
+class TFippsTACHit : public TDetectorHit {
 public:
    TFippsTACHit();
    ~TFippsTACHit() override;
    TFippsTACHit(const TFippsTACHit&);
-   TFippsTACHit(const TFragment& frag) : TILLDetectorHit(frag) {}
+   TFippsTACHit(const TFragment& frag) : TDetectorHit(frag) {}
 
 private:
    Int_t fFilter{0};

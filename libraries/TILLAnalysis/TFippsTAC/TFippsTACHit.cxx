@@ -22,7 +22,7 @@ TFippsTACHit::TFippsTACHit()
 
 TFippsTACHit::~TFippsTACHit() = default;
 
-TFippsTACHit::TFippsTACHit(const TFippsTACHit& rhs) : TILLDetectorHit()
+TFippsTACHit::TFippsTACHit(const TFippsTACHit& rhs) : TDetectorHit()
 {
 	// Copy Constructor
 #if MAJOR_ROOT_VERSION < 6
@@ -35,7 +35,7 @@ TFippsTACHit::TFippsTACHit(const TFippsTACHit& rhs) : TILLDetectorHit()
 void TFippsTACHit::Copy(TObject& rhs) const
 {
 	// Copies a TFippsTACHit
-	TILLDetectorHit::Copy(rhs);
+	TDetectorHit::Copy(rhs);
 	static_cast<TFippsTACHit&>(rhs).fFilter = fFilter;
 }
 
@@ -87,7 +87,7 @@ void TFippsTACHit::Clear(Option_t*)
 {
 	// Clears the TACHit
 	fFilter = 0;
-	TILLDetectorHit::Clear();
+	TDetectorHit::Clear();
 }
 
 void TFippsTACHit::Print(Option_t*) const

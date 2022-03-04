@@ -12,9 +12,9 @@
 
 #include "TFragment.h"
 #include "TChannel.h"
-#include "TILLDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TFippsHit : public TILLDetectorHit {
+class TFippsHit : public TDetectorHit {
 public:
    TFippsHit();
    TFippsHit(const TFippsHit&);

@@ -109,3 +109,13 @@ TClass* TILLMnemonic::GetClassType() const
 	};
 	return fClassType;
 }
+
+double TILLMnemonic::GetTime(Long64_t timestamp, Float_t, double energy, const TChannel* channel) const
+{
+	if(channel == nullptr) {
+      Error("GetTime", "No TChannel provided");
+      return static_cast<Double_t>((timestamp) + gRandom->Uniform());
+   }
+	Double_t dTime = static_cast<Double_t>((timestamp) + gRandom->Uniform()) * channel->GetTimeStampUnit();
+	return dTime - channel->GetTZero(energy);
+}
