@@ -545,7 +545,7 @@ void TFipps::FixCrossTalk()
 
 	for(auto& one : hit_vec) {
 		for(auto& two : hit_vec) {
-			one->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(one), static_cast<TFippsHit*>(two));
+			one->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(one), static_cast<TFippsHit*>(two)));
       }
    }
    SetCrossTalk(true);

@@ -37,7 +37,7 @@ void TFippsPulser::AddFragment(const std::shared_ptr<const TFragment>& frag, TCh
       return;
    }
 
-   TILLDetectorHit* hit = new TILLDetectorHit(*frag);
+   auto hit = new TDetectorHit(*frag);
    fHits.push_back(hit);
 }
 

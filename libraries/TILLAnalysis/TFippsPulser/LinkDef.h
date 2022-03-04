@@ -6,8 +6,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-// #pragma link C++ class TILLDetectorHit+;
-// #pragma link C++ class std::vector<TILLDetectorHit>+;
 #pragma link C++ class TFippsPulser+;
 
 #endif
