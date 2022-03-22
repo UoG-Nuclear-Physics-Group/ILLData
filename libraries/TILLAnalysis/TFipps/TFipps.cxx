@@ -97,18 +97,6 @@ TVector3 TFipps::gCloverPosition[17] = {
             TMath::Cos(TMath::DegToRad() * (135.0))) // G: 14 F: 15
             };
 
-// Cross Talk stuff
-const Double_t TFipps::gStrongCT[2]           = {-0.02674, -0.000977}; // This is for the 0-1 and 2-3 combination
-const Double_t TFipps::gWeakCT[2]             = {0.005663, -0.00028014};
-const Double_t TFipps::gCrossTalkPar[2][4][4] = {{{0.0, gStrongCT[0], gWeakCT[0], gWeakCT[0]},
-                                                  {gStrongCT[0], 0.0, gWeakCT[0], gWeakCT[0]},
-                                                  {gWeakCT[0], gWeakCT[0], 0.0, gStrongCT[0]},
-                                                  {gWeakCT[0], gWeakCT[0], gStrongCT[0], 0.0}},
-                                                 {{0.0, gStrongCT[1], gWeakCT[1], gWeakCT[1]},
-                                                  {gStrongCT[1], 0.0, gWeakCT[1], gWeakCT[1]},
-                                                  {gWeakCT[1], gWeakCT[1], 0.0, gStrongCT[1]},
-                                                  {gWeakCT[1], gWeakCT[1], gStrongCT[1], 0.0}}};
-
 TFipps::TFipps() : TSuppressed()
 {
 // Default ctor. Ignores TObjectStreamer in ROOT < 6
@@ -506,6 +494,7 @@ void TFipps::SetBitNumber(enum EFippsBits bit, Bool_t set) const
    fFippsBits.SetBit(bit, set);
 }
 
+
 Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const TFippsHit* const other_hit,
                                    Bool_t time_constraint)
 {
@@ -525,9 +514,23 @@ Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const 
    if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
       return hit_to_correct->GetEnergy();
    }
-   return hit_to_correct->GetEnergy() -
-          (gCrossTalkPar[0][hit_to_correct->GetCrystal()][other_hit->GetCrystal()] +
-           gCrossTalkPar[1][hit_to_correct->GetCrystal()][other_hit->GetCrystal()] * other_hit->GetNoCTEnergy());
+	static bool been_warned[256] = {false};
+	double      fixed_energy     = hit_to_correct->GetEnergy();
+	try {
+		if(hit_to_correct->GetChannel() != nullptr) {
+			fixed_energy -= hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
+		}
+	} catch(const std::out_of_range& oor) {
+		int id = 16 * hit_to_correct->GetDetector() + 4 * hit_to_correct->GetCrystal() + other_hit->GetCrystal();
+		if(!been_warned[id]) {
+			been_warned[id] = true;
+			std::cerr<<DRED<<"Missing CT correction for Det: "<<hit_to_correct->GetDetector()
+				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<RESET_COLOR<<std::endl;
+		}
+		return hit_to_correct->GetEnergy();
+	}
+
+	return fixed_energy;
 }
 
 void TFipps::FixCrossTalk()
@@ -545,7 +548,7 @@ void TFipps::FixCrossTalk()
 
 	for(auto& one : hit_vec) {
 		for(auto& two : hit_vec) {
-			one->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(one), static_cast<TFippsHit*>(two)));
+			one->SetEnergy(CTCorrectedEnergy(static_cast<TFippsHit*>(one), static_cast<TFippsHit*>(two)));
       }
    }
    SetCrossTalk(true);
