@@ -10,7 +10,7 @@ ClassImp(TFippsTAC)
 TFippsTAC::TFippsTAC()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -24,7 +24,7 @@ TFippsTAC::~TFippsTAC()
 TFippsTAC::TFippsTAC(const TFippsTAC& rhs) : TDetector()
 {
 	// Copy Contructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	rhs.Copy(*this);

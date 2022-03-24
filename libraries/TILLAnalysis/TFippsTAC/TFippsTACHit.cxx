@@ -14,7 +14,7 @@ ClassImp(TFippsTACHit)
 TFippsTACHit::TFippsTACHit()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -25,7 +25,7 @@ TFippsTACHit::~TFippsTACHit() = default;
 TFippsTACHit::TFippsTACHit(const TFippsTACHit& rhs) : TDetectorHit()
 {
 	// Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();

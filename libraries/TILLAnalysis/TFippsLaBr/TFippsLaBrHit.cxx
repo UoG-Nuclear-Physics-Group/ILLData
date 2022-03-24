@@ -14,7 +14,7 @@ ClassImp(TFippsLaBrHit)
 TFippsLaBrHit::TFippsLaBrHit()
 {
 // Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -25,7 +25,7 @@ TFippsLaBrHit::~TFippsLaBrHit() = default;
 TFippsLaBrHit::TFippsLaBrHit(const TFippsLaBrHit& rhs) : TFippsHit()
 {
 // Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();

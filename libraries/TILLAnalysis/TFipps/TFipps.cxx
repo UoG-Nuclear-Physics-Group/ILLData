@@ -100,7 +100,7 @@ TVector3 TFipps::gCloverPosition[17] = {
 TFipps::TFipps() : TSuppressed()
 {
 // Default ctor. Ignores TObjectStreamer in ROOT < 6
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -109,7 +109,7 @@ TFipps::TFipps() : TSuppressed()
 TFipps::TFipps(const TFipps& rhs) : TSuppressed()
 {
 // Copy ctor. Ignores TObjectStreamer in ROOT < 6
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    rhs.Copy(*this);

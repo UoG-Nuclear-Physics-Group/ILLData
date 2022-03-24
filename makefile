@@ -15,8 +15,6 @@ SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
 
-MAJOR_ROOT_VERSION:=$(shell root-config --version | cut -d '.' -f1)
-MINOR_ROOT_VERSION:=$(shell root-config --version | cut -d '.' -f2 | cut -d '/' -f1)
 ROOT_PYTHON_VERSION=$(shell root-config --python-version)
 
 MATHMORE_INSTALLED:=$(shell root-config --has-mathmore)
@@ -32,7 +30,6 @@ lib_o_files     = $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(call lib_src_files,$(1
 lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
 lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_linkdef,$(1)))
 	
-CFLAGS += -DMAJOR_ROOT_VERSION=${MAJOR_ROOT_VERSION}
 ifeq ($(ROOT_PYTHON_VERSION),2.7)
   CFLAGS += -DHAS_CORRECT_PYTHON_VERSION
 endif
