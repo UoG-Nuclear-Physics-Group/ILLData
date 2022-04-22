@@ -39,7 +39,14 @@ TFippsTAC& TFippsTAC::operator=(const TFippsTAC& rhs)
 void TFippsTAC::Print(Option_t*) const
 {
 	// Prints out TFippsTAC Multiplicity, currently does little.
-	printf("%lu fHits\n", fHits.size());
+	Print(std::cout);
+}
+
+void TFippsTAC::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 void TFippsTAC::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)

@@ -48,8 +48,8 @@ protected:
    int32_t fLstVersion = 1; ///< Lst version
 
    /// \cond CLASSIMP
-   ClassDefOverride(TLstEvent, 0) // All of the data contained in a Midas Event
+   ClassDefOverride(TLstEvent, 0) // All of the data contained in a LST Event
    /// \endcond
 };
 /*! @} */
-#endif // TMidasEvent.h
+#endif // TLstEvent.h

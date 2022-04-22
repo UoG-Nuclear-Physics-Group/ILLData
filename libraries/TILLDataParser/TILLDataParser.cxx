@@ -35,10 +35,9 @@ int TILLDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
    uint32_t size = event->GetDataSize();
    uint32_t* EvntData = reinterpret_cast<uint32_t*>(event->GetData());
 
-   if( fInputSize != nullptr )
-      *fInputSize += event->GetDataSize()/16; // 16 bytes per event, number of bytes in 32bits
+   if(fInputSize != nullptr) *fInputSize += event->GetDataSize()/16; // 16 bytes per event, number of bytes in 32bits
 
-   if( event->GetLstVersion() == 1 ) {
+   if(event->GetLstVersion() == 1) {
       for( size_t i = 0; i + 3 < size/4; i += 4 ) {
          EventsProcessed += V1SingleFippsEventToFragment(EvntData + i);
          if(fItemsPopped != nullptr && fInputSize != nullptr) {
@@ -69,8 +68,8 @@ int TILLDataParser::V1SingleFippsEventToFragment(uint32_t* data)
    // Rollover, constant beween boards
    tmpTimestamp = data[0] & 0xffff;
 
-   // Concatonate timestamp informatioan based on board type
-   switch( static_cast<EDigitizer>((data[0] >> 22) && 0x3F) ) {
+   // Concatenate timestamp informatioan based on board type
+   switch(static_cast<EDigitizer>((data[0] >> 22) & 0x3F) ) {
       case EDigitizer::kV1724: 
          tmpTimestamp = tmpTimestamp<<30;
          tmpTimestamp |= data[1] & 0x3ffffffF; // 30 bit timestamp

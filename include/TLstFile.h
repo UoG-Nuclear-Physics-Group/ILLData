@@ -62,7 +62,7 @@ private:
 
 protected:
    /// \cond CLASSIMP
-   ClassDefOverride(TLstFile, 0) // Used to open and write Midas Files
+   ClassDefOverride(TLstFile, 0) // Used to open and write LST Files
    /// \endcond
 };
 /*! @} */

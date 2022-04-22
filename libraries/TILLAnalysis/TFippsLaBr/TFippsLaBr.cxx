@@ -85,7 +85,14 @@ TFippsLaBr& TFippsLaBr::operator=(const TFippsLaBr& rhs)
 void TFippsLaBr::Print(Option_t*) const
 {
 	// Prints out TFippsLaBr Multiplicity, currently does little.
-	printf("%lu fHits\n", fHits.size());
+	Print(std::cout);
+}
+
+void TFippsLaBr::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 bool TFippsLaBr::IsSuppressed() const
