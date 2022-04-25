@@ -36,7 +36,11 @@ void TFippsTACHit::Copy(TObject& rhs) const
 {
 	// Copies a TFippsTACHit
 	TDetectorHit::Copy(rhs);
-	static_cast<TFippsTACHit&>(rhs).fFilter = fFilter;
+}
+
+void TFippsTACHit::Copy(TObject& obj, bool) const
+{
+	Copy(obj);
 }
 
 Double_t TFippsTACHit::GetTempCorrectedCharge(TGraph* correction_graph) const {
@@ -75,18 +79,9 @@ Double_t TFippsTACHit::GetTempCorrectedEnergy(TGraph* correction_graph) const {
 	return channel->CalibrateENG(TempCorrectedCharge(correction_graph));
 }
 
-bool TFippsTACHit::InFilter(Int_t)
-{
-	// check if the desired filter is in wanted filter;
-	// return the answer;
-	// currently does nothing
-	return true;
-}
-
 void TFippsTACHit::Clear(Option_t*)
 {
 	// Clears the TACHit
-	fFilter = 0;
 	TDetectorHit::Clear();
 }
 

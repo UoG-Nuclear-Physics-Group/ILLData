@@ -22,7 +22,7 @@ TFippsLaBrHit::TFippsLaBrHit()
 
 TFippsLaBrHit::~TFippsLaBrHit() = default;
 
-TFippsLaBrHit::TFippsLaBrHit(const TFippsLaBrHit& rhs) : TFippsHit()
+TFippsLaBrHit::TFippsLaBrHit(const TFippsLaBrHit& rhs) : TDetectorHit()
 {
 // Copy Constructor
 #if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
@@ -35,8 +35,12 @@ TFippsLaBrHit::TFippsLaBrHit(const TFippsLaBrHit& rhs) : TFippsHit()
 void TFippsLaBrHit::Copy(TObject& rhs) const
 {
    // Copies a TFippsLaBrHit
-   TFippsHit::Copy(rhs);
-   static_cast<TFippsLaBrHit&>(rhs).fFilter = fFilter;
+   TDetectorHit::Copy(rhs);
+}
+
+void TFippsLaBrHit::Copy(TObject& obj, bool) const
+{
+	Copy(obj);
 }
 
 TVector3 TFippsLaBrHit::GetPosition(Double_t) const
@@ -51,19 +55,10 @@ TVector3 TFippsLaBrHit::GetPosition() const
    return GetPosition(GetDefaultDistance());
 }
 
-bool TFippsLaBrHit::InFilter(Int_t)
-{
-   // check if the desired filter is in wanted filter;
-   // return the answer;
-   // currently does nothing
-   return true;
-}
-
 void TFippsLaBrHit::Clear(Option_t*)
 {
    // Clears the LaBrHit
-   fFilter = 0;
-   TFippsHit::Clear();
+   TDetectorHit::Clear();
 }
 
 void TFippsLaBrHit::Print(Option_t*) const

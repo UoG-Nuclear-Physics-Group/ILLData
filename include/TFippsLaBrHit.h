@@ -22,32 +22,21 @@
 
 #include "TVector3.h"
 
-#include "TFippsHit.h"
+#include "TDetectorHit.h"
 
-class TFippsLaBrHit : public TFippsHit {
+class TFippsLaBrHit : public TDetectorHit {
 public:
    TFippsLaBrHit();
    ~TFippsLaBrHit() override;
    TFippsLaBrHit(const TFippsLaBrHit&);
-   TFippsLaBrHit(const TFragment& frag) : TFippsHit(frag) {}
+   TFippsLaBrHit(const TFragment& frag) : TDetectorHit(frag) {}
 
-private:
-   Int_t fFilter{0};
-
-public:
-   /////////////////////////		/////////////////////////////////////
-   inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
-
-   /////////////////////////		/////////////////////////////////////
-   inline Int_t GetFilterPattern() const { return fFilter; } //!<!
-
-   bool InFilter(Int_t); //!<!
-
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override;
-   void     Copy(TObject&) const override;        //!<!
+   void Copy(TObject&) const override;            //!<!
+   void Copy(TObject&, bool) const override;      //!<!
+
    TVector3 GetPosition(Double_t dist) const override;
    TVector3 GetPosition() const override;
 
