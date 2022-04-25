@@ -30,13 +30,13 @@ void TILLDetectorInformation::Print(Option_t* opt) const
    // Prints the TILLDetectorInformation. Options:
    // a: Print out more details.
    if(strchr(opt, 'a') != nullptr) {
-      printf("\t\tFIPPS:            %s\n", Fipps() ? "true" : "false");
-      printf("\t\tFIPPSBGO:         %s\n", FippsBgo() ? "true" : "false");
-      printf("\t\tFIPPSLABR:        %s\n", FippsLaBr() ? "true" : "false");
-      printf("\t\tFIPPSLABRBGO:     %s\n", FippsLaBrBgo() ? "true" : "false");
-      printf("\t\tFIPPSTAC:         %s\n", FippsTAC() ? "true" : "false");
-      printf("\t\tFIPPSPULSER:      %s\n", FippsPulser() ? "true" : "false");
-      printf("\n");
+		std::cout<<"\t\tFIPPS:        "<<(Fipps() ? "true" : "false")<<std::endl;
+		std::cout<<"\t\tFIPPSBGO:         "<<(FippsBgo() ? "true" : "false")<<std::endl;
+      std::cout<<"\t\tFIPPSLABR:        "<<(FippsLaBr() ? "true" : "false")<<std::endl;
+      std::cout<<"\t\tFIPPSLABRBGO:     "<<(FippsLaBrBgo() ? "true" : "false")<<std::endl;
+      std::cout<<"\t\tFIPPSTAC:         "<<(FippsTAC() ? "true" : "false")<<std::endl;
+      std::cout<<"\t\tFIPPSPULSER:      "<<(FippsPulser() ? "true" : "false")<<std::endl;
+      std::cout<<std::endl;
    }
 }
 

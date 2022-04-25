@@ -12,7 +12,7 @@ TFippsHit::TFippsHit()
 	: TDetectorHit()
 {
 	// Default Ctor. Ignores TObject Streamer in ROOT < 6.
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -50,12 +50,18 @@ void TFippsHit::Clear(Option_t* opt)
 void TFippsHit::Print(Option_t*) const
 {
 	// Prints the Detector Number, Crystal Number, Energy, Time and Angle.
-	printf("Fipps Detector: %i\n", GetDetector());
-	printf("Fipps Crystal:  %i\n", GetCrystal());
-	printf("Fipps Energy:   %lf\n", GetEnergy());
-	printf("Fipps hit time:   %lf\n", GetTime());
-	printf("Fipps hit TV3 theta: %.2f\tphi%.2f\n", GetPosition().Theta() * 180 / (3.141597),
-			GetPosition().Phi() * 180 / (3.141597));
+	Print(std::cout);
+}
+
+void TFippsHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"Fipps Detector: "<<GetDetector()<<std::endl;
+	str<<"Fipps Crystal:  "<<GetCrystal()<<std::endl;
+	str<<"Fipps Energy:   "<<GetEnergy()<<std::endl;
+	str<<"Fipps hit time: "<<GetTime()<<std::endl;
+	str<<"Fipps hit TV3 theta: "<<GetPosition().Theta() * 180./3.141597<<"\tphi"<<GetPosition().Phi() * 180./3.141597<<std::endl;
+	out<<str.str();
 }
 
 TVector3 TFippsHit::GetPosition(double dist) const

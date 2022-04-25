@@ -14,7 +14,7 @@ ClassImp(TFippsTACHit)
 TFippsTACHit::TFippsTACHit()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -25,7 +25,7 @@ TFippsTACHit::~TFippsTACHit() = default;
 TFippsTACHit::TFippsTACHit(const TFippsTACHit& rhs) : TDetectorHit()
 {
 	// Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -96,7 +96,14 @@ void TFippsTACHit::Print(Option_t*) const
 	// Detector
 	// Energy
 	// Time
-	printf("TAC Detector: %i\n", GetDetector());
-	printf("TAC hit energy: %.2f\n", GetEnergy());
-	printf("TAC hit time:   %.lf\n", GetTime());
+	Print(std::cout);
+}
+
+void TFippsTACHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"TAC Detector:   "<<GetDetector()<<std::endl;
+	str<<"TAC hit energy: "<<GetEnergy()<<std::endl;
+	str<<"TAC hit time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }

@@ -75,14 +75,14 @@ void TLstEvent::Print(const char* option) const
    /// printed out too.
    ///
 
-   printf("Event start:\n");
+	std::cout<<"Event start:"<<std::endl;
    if(option[0] == 'a') {
       for(size_t i = 0; i < fData.size() / 4; ++i) {
-         printf("0x%08x", ((uint32_t*)fData.data())[i]);
+			std::cout<<hex(((uint32_t*)fData.data())[i],8)<<std::endl;
          if(i % 10 == 9) {
-            printf("\n");
+				std::cout<<std::endl;
          } else {
-            printf(" ");
+				std::cout<<" ";
          }
       }
    }
