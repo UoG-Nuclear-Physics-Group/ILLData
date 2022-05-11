@@ -1,4 +1,4 @@
-#include "TFipps.h"
+#include "TIfin.h"
 
 #include <sstream>
 #include <iostream>
@@ -12,76 +12,76 @@
 #include "TGRSIOptions.h"
 
 /// \cond CLASSIMP
-ClassImp(TFipps)
+ClassImp(TIfin)
 /// \endcond
 
 
-bool DefaultFippsAddback(const TDetectorHit* one, const TDetectorHit* two)
+bool DefaultIfinAddback(const TDetectorHit* one, const TDetectorHit* two)
 {
    return ((one->GetDetector() == two->GetDetector()) &&
            (std::fabs(one->GetTime() - two->GetTime()) < TGRSIOptions::AnalysisOptions()->AddbackWindow()));
 }
 
-std::function<bool(const TDetectorHit*, const TDetectorHit*)> TFipps::fAddbackCriterion = DefaultFippsAddback;
+std::function<bool(const TDetectorHit*, const TDetectorHit*)> TIfin::fAddbackCriterion = DefaultIfinAddback;
 
-bool DefaultFippsSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit)
+bool DefaultIfinSuppression(const TDetectorHit* hit, const TDetectorHit* bgoHit)
 {
 	return ((hit->GetDetector() == bgoHit->GetDetector()) &&
 	(std::fabs(hit->GetTime() - bgoHit->GetTime()) < TGRSIOptions::AnalysisOptions()->SuppressionWindow()) &&
 	(bgoHit->GetEnergy() > TGRSIOptions::AnalysisOptions()->SuppressionEnergy()));
 }
 
-std::function<bool(const TDetectorHit*, const TDetectorHit*)> TFipps::fSuppressionCriterion = DefaultFippsSuppression;
+std::function<bool(const TDetectorHit*, const TDetectorHit*)> TIfin::fSuppressionCriterion = DefaultIfinSuppression;
 
-// Fipps detector locations.
+// Ifin detector locations.
 // Angles are in ISO standard
 // x = cos(theta)*sin(phi)      // Points port
 // y = sin(theta)*sin(phi)      // Points upwards
 // z = sin(theta)               // Points in the direction of the neutrons
 // TVector(x,y,z)
 // TODO: Add link to picture showing detector positions when uploaded
-TVector3 TFipps::gCloverPosition[17] = {
+TVector3 TIfin::gCloverPosition[17] = {
    TVector3(TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
             TMath::Sin(TMath::DegToRad() * (0.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
             TMath::Cos(TMath::DegToRad() * (0.0))), // Zeroth Position
    // Corona
    TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (90.0)),
             TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (90.0)),
-            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 0
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Ifin Pos 0
    TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (45.0)),
             TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (45.0)),
-            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 1
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Ifin Pos 1
    TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
             TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
-            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 2
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Ifin Pos 2
    TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (315.0)),
             TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (315.0)),
-            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 3
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Ifin Pos 3
    TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (270.0)),
             TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (270.0)),
-            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 4
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Ifin Pos 4
    TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (225.0)),
             TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (225.0)),
-            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 5
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Ifin Pos 5
    TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (180.0)),
             TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (180.0)),
-            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 6
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Ifin Pos 6
    TVector3(TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Cos(TMath::DegToRad() * (135.0)),
             TMath::Sin(TMath::DegToRad() * (90.0)) * TMath::Sin(TMath::DegToRad() * (135.0)),
-            TMath::Cos(TMath::DegToRad() * (90.0))), // Fipps Pos 7
+            TMath::Cos(TMath::DegToRad() * (90.0))), // Ifin Pos 7
    // Downstream lampshade
    TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (90.0)),
             TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (90.0)),
-            TMath::Cos(TMath::DegToRad() * (45.0))), // Fipps Pos 8
+            TMath::Cos(TMath::DegToRad() * (45.0))), // Ifin Pos 8
    TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (0.0)),
             TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (0.0)),
-            TMath::Cos(TMath::DegToRad() * (45.0))), // Fipps Pos 9
+            TMath::Cos(TMath::DegToRad() * (45.0))), // Ifin Pos 9
    TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (270.0)),
             TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (270.0)),
-            TMath::Cos(TMath::DegToRad() * (45.0))), // Fipps Pos 10
+            TMath::Cos(TMath::DegToRad() * (45.0))), // Ifin Pos 10
    TVector3(TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Cos(TMath::DegToRad() * (180.0)),
             TMath::Sin(TMath::DegToRad() * (45.0)) * TMath::Sin(TMath::DegToRad() * (180.0)),
-            TMath::Cos(TMath::DegToRad() * (45.0))), // Fipps Pos 11
+            TMath::Cos(TMath::DegToRad() * (45.0))), // Ifin Pos 11
    // Upstream lampshade
    TVector3(TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Cos(TMath::DegToRad() * (90.0)),
             TMath::Sin(TMath::DegToRad() * (135.0)) * TMath::Sin(TMath::DegToRad() * (90.0)),
@@ -97,38 +97,50 @@ TVector3 TFipps::gCloverPosition[17] = {
             TMath::Cos(TMath::DegToRad() * (135.0))) // G: 14 F: 15
             };
 
-TFipps::TFipps() : TSuppressed()
+// Cross Talk stuff
+const Double_t TIfin::gStrongCT[2]           = {-0.02674, -0.000977}; // This is for the 0-1 and 2-3 combination
+const Double_t TIfin::gWeakCT[2]             = {0.005663, -0.00028014};
+const Double_t TIfin::gCrossTalkPar[2][4][4] = {{{0.0, gStrongCT[0], gWeakCT[0], gWeakCT[0]},
+                                                  {gStrongCT[0], 0.0, gWeakCT[0], gWeakCT[0]},
+                                                  {gWeakCT[0], gWeakCT[0], 0.0, gStrongCT[0]},
+                                                  {gWeakCT[0], gWeakCT[0], gStrongCT[0], 0.0}},
+                                                 {{0.0, gStrongCT[1], gWeakCT[1], gWeakCT[1]},
+                                                  {gStrongCT[1], 0.0, gWeakCT[1], gWeakCT[1]},
+                                                  {gWeakCT[1], gWeakCT[1], 0.0, gStrongCT[1]},
+                                                  {gWeakCT[1], gWeakCT[1], gStrongCT[1], 0.0}}};
+
+TIfin::TIfin() : TSuppressed()
 {
 // Default ctor. Ignores TObjectStreamer in ROOT < 6
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
+#if MAJOR_ROOT_VERSION < 6
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
 }
 
-TFipps::TFipps(const TFipps& rhs) : TSuppressed()
+TIfin::TIfin(const TIfin& rhs) : TSuppressed()
 {
 // Copy ctor. Ignores TObjectStreamer in ROOT < 6
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
+#if MAJOR_ROOT_VERSION < 6
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    rhs.Copy(*this);
 }
 
-void TFipps::Copy(TObject& rhs) const
+void TIfin::Copy(TObject& rhs) const
 {
    // Copy function.
    TSuppressed::Copy(rhs);
 
-   static_cast<TFipps&>(rhs).fAddbackHits.clear();
-   static_cast<TFipps&>(rhs).fAddbackFrags.clear();
-   static_cast<TFipps&>(rhs).fSuppressedHits.clear();
-   static_cast<TFipps&>(rhs).fSuppressedAddbackHits.clear();
-   static_cast<TFipps&>(rhs).fSuppressedAddbackFrags.clear();
-   static_cast<TFipps&>(rhs).fFippsBits    = 0;
+   static_cast<TIfin&>(rhs).fAddbackHits.clear();
+   static_cast<TIfin&>(rhs).fAddbackFrags.clear();
+   static_cast<TIfin&>(rhs).fSuppressedHits.clear();
+   static_cast<TIfin&>(rhs).fSuppressedAddbackHits.clear();
+   static_cast<TIfin&>(rhs).fSuppressedAddbackFrags.clear();
+   static_cast<TIfin&>(rhs).fIfinBits    = 0;
 }
 
-TFipps::~TFipps()
+TIfin::~TIfin()
 {
    // Default Destructor
 
@@ -139,7 +151,7 @@ TFipps::~TFipps()
 
 }
 
-void TFipps::Clear(Option_t* opt)
+void TIfin::Clear(Option_t* opt)
 {
    // Clears the mother, and all of the hits
    ClearStatus();
@@ -157,106 +169,101 @@ void TFipps::Clear(Option_t* opt)
    fSuppressedAddbackFrags.clear();
 }
 
-void TFipps::Print(Option_t*) const
+void TIfin::Print(Option_t*) const
 {
-	Print(std::cout);
-}
-
-void TFipps::Print(std::ostream& out) const
-{
-	std::ostringstream str;
-   str<<"Fipps Contains: "<<std::endl;
-   str<<std::setw(6)<<GetMultiplicity()<<" hits"<<std::endl;
+   std::cout<<"Ifin Contains: "<<std::endl;
+   std::cout<<std::setw(6)<<GetMultiplicity()<<" hits"<<std::endl;
 
    if(IsAddbackSet()) {
-      str<<std::setw(6)<<fAddbackHits.size()<<" addback hits"<<std::endl;
+      std::cout<<std::setw(6)<<fAddbackHits.size()<<" addback hits"<<std::endl;
    } else {
-      str<<std::setw(6)<<" "<<" Addback not set"<<std::endl;
+      std::cout<<std::setw(6)<<" "
+               <<" Addback not set"<<std::endl;
    }
 
-   str<<std::setw(6)<<" "<<" Cross-talk Set?  "<<IsCrossTalkSet()<<std::endl;
-	out<<str.str();
+   std::cout<<std::setw(6)<<" "
+            <<" Cross-talk Set?  "<<IsCrossTalkSet()<<std::endl;
 }
 
-TFipps& TFipps::operator=(const TFipps& rhs)
+TIfin& TIfin::operator=(const TIfin& rhs)
 {
    rhs.Copy(*this);
    return *this;
 }
 
 
-std::vector<TDetectorHit*>& TFipps::GetAddbackVector()
+std::vector<TDetectorHit*>& TIfin::GetAddbackVector()
 {
    return fAddbackHits;
 }
 
-std::vector<UShort_t>& TFipps::GetAddbackFragVector()
+std::vector<UShort_t>& TIfin::GetAddbackFragVector()
 {
    return fAddbackFrags;
 }
 
-std::vector<TDetectorHit*>& TFipps::GetSuppressedVector()
+std::vector<TDetectorHit*>& TIfin::GetSuppressedVector()
 {
     return fSuppressedHits;
 }
 
-std::vector<TDetectorHit*>& TFipps::GetSuppressedAddbackVector()
+std::vector<TDetectorHit*>& TIfin::GetSuppressedAddbackVector()
 {
     return fSuppressedAddbackHits;
 }
 
-std::vector<UShort_t>& TFipps::GetSuppressedAddbackFragVector()
+std::vector<UShort_t>& TIfin::GetSuppressedAddbackFragVector()
 {
     return fSuppressedAddbackFrags;
 }
 
-bool TFipps::IsAddbackSet() const
+bool TIfin::IsAddbackSet() const
 {
-   return TestBitNumber(EFippsBits::kIsAddbackSet);
+   return TestBitNumber(EIfinBits::kIsAddbackSet);
 }
 
-bool TFipps::IsCrossTalkSet() const
+bool TIfin::IsCrossTalkSet() const
 {
-   return TestBitNumber(EFippsBits::kIsCrossTalkSet);
+   return TestBitNumber(EIfinBits::kIsCrossTalkSet);
 }
 
-bool TFipps::IsSuppressed() const
+bool TIfin::IsSuppressed() const
 {
-    return TestBitNumber(EFippsBits::kIsSuppressedSet);
+    return TestBitNumber(EIfinBits::kIsSuppressedSet);
 }
 
-bool TFipps::IsSuppressedAddbackSet() const
+bool TIfin::IsSuppressedAddbackSet() const
 {
-    return TestBitNumber(EFippsBits::kIsSuppressedAddbackSet);
+    return TestBitNumber(EIfinBits::kIsSuppressedAddbackSet);
 }
 
-void TFipps::SetAddback(const Bool_t flag) const
+void TIfin::SetAddback(const Bool_t flag) const
 {
-   return SetBitNumber(EFippsBits::kIsAddbackSet, flag);
+   return SetBitNumber(EIfinBits::kIsAddbackSet, flag);
 }
 
-void TFipps::SetCrossTalk(const Bool_t flag) const
+void TIfin::SetCrossTalk(const Bool_t flag) const
 {
-   return SetBitNumber(EFippsBits::kIsCrossTalkSet, flag);
+   return SetBitNumber(EIfinBits::kIsCrossTalkSet, flag);
 }
 
-void TFipps::SetSuppressed(const Bool_t flag) const
+void TIfin::SetSuppressed(const Bool_t flag) const
 {
-    return SetBitNumber(EFippsBits::kIsSuppressedSet, flag);
+    return SetBitNumber(EIfinBits::kIsSuppressedSet, flag);
 }
 
-void TFipps::SetSuppressedAddback(const Bool_t flag) const
+void TIfin::SetSuppressedAddback(const Bool_t flag) const
 {
-    return SetBitNumber(EFippsBits::kIsSuppressedAddbackSet, flag);
+    return SetBitNumber(EIfinBits::kIsSuppressedAddbackSet, flag);
 }
 
-TFippsHit* TFipps::GetFippsHit(const int& i)
+TIfinHit* TIfin::GetIfinHit(const int& i)
 {
    try {
       if(!IsCrossTalkSet()) {
          FixCrossTalk();
       }
-      return static_cast<TFippsHit*>(fHits.at(i));
+      return static_cast<TIfinHit*>(fHits.at(i));
    } catch(const std::out_of_range& oor) {
       std::cerr<<ClassName()<<" Hits are out of range: "<<oor.what()<<std::endl;
       if(!gInterpreter) {
@@ -266,13 +273,13 @@ TFippsHit* TFipps::GetFippsHit(const int& i)
    return nullptr;
 }
 
-TFippsHit* TFipps::GetSuppressedHit(const int& i)
+TIfinHit* TIfin::GetSuppressedHit(const int& i)
 {
     try {
         if(!IsCrossTalkSet()) {
             FixCrossTalk();
         }
-        return static_cast<TFippsHit*>(fSuppressedHits.at(i));
+        return static_cast<TIfinHit*>(fSuppressedHits.at(i));
    } catch(const std::out_of_range& oor) {
       std::cerr<<ClassName()<<"Suppressed hits are out of range: "<<oor.what()<<std::endl;
       if(!gInterpreter) {
@@ -282,7 +289,7 @@ TFippsHit* TFipps::GetSuppressedHit(const int& i)
    return nullptr;
 }
 
-Int_t TFipps::GetSuppressedMultiplicity(const TBgo* bgo)
+Int_t TIfin::GetSuppressedMultiplicity(const TBgo* bgo)
 {
 	/// Automatically builds the suppressed hits using the fSuppressionCriterion and returns the number of suppressed hits
    if(!IsCrossTalkSet()) {
@@ -307,7 +314,7 @@ Int_t TFipps::GetSuppressedMultiplicity(const TBgo* bgo)
 }
     
 
-Int_t TFipps::GetAddbackMultiplicity()
+Int_t TIfin::GetAddbackMultiplicity()
 {
    // Automatically builds the addback hits using the fAddbackCriterion (if
    // the size of the fAddbackHits vector is zero) and return the number of
@@ -335,7 +342,7 @@ Int_t TFipps::GetAddbackMultiplicity()
    return ab_vec.size();
 }
 
-Int_t TFipps::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
+Int_t TIfin::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
 {
    // Automatically builds the addback hits using the fAddbackCriterion (if
    // the size of the fAddbackHits vector is zero) and return the number of
@@ -364,13 +371,13 @@ Int_t TFipps::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
 }
 
 
-TFippsHit* TFipps::GetAddbackHit(const int& i)
+TIfinHit* TIfin::GetAddbackHit(const int& i)
 {
    try{
        if(!IsCrossTalkSet()) {
            FixCrossTalk();
        }
-       return static_cast<TFippsHit*>(GetAddbackVector().at(i));
+       return static_cast<TIfinHit*>(GetAddbackVector().at(i));
    } catch(const std::out_of_range& oor) {
        std::cerr<<ClassName()<<" Addback hits are out of range: "<<oor.what()<<std::endl;
        if(!gInterpreter) {
@@ -380,13 +387,13 @@ TFippsHit* TFipps::GetAddbackHit(const int& i)
    return nullptr;
 }
 
-TFippsHit* TFipps::GetSuppressedAddbackHit(const int& i)
+TIfinHit* TIfin::GetSuppressedAddbackHit(const int& i)
 {
    try{
        if(!IsCrossTalkSet()) {
            FixCrossTalk();
        }
-       return static_cast<TFippsHit*>(GetSuppressedAddbackVector().at(i));
+       return static_cast<TIfinHit*>(GetSuppressedAddbackVector().at(i));
    } catch(const std::out_of_range& oor) {
        std::cerr<<ClassName()<<" Suppressed addback hits are out of range: "<<oor.what()<<std::endl;
        if(!gInterpreter) {
@@ -396,7 +403,7 @@ TFippsHit* TFipps::GetSuppressedAddbackHit(const int& i)
    return nullptr;
 }
 
-void TFipps::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
+void TIfin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
 {
    // Builds the FIPPS Hits directly from the TFragment. Basically, loops through the hits for an event and sets
    // observables.
@@ -408,8 +415,8 @@ void TFipps::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*
    switch(chan->GetMnemonic()->SubSystem()) {
 		case TMnemonic::EMnemonic::kG: 
 			{
-				auto hit = new TFippsHit(*frag);
-				fHits.push_back(hit);
+				auto geHit = new TIfinHit(*frag);
+				fHits.push_back(std::move(geHit));
 			}
 			break;
 		default:
@@ -417,7 +424,7 @@ void TFipps::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*
    };
 }
 
-TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
+TVector3 TIfin::GetPosition(int DetNbr, int CryNbr, double dist)
 {
    // Gets the position vector for a crystal specified by CryNbr within Clover DetNbr at a distance of dist mm away.
    // This is calculated to the most likely interaction point within the crystal.
@@ -455,12 +462,12 @@ TVector3 TFipps::GetPosition(int DetNbr, int CryNbr, double dist)
    return (CloverPosition + CrystalPosition);
 }
 
-void TFipps::ResetFlags() const
+void TIfin::ResetFlags() const
 {
-   fFippsBits = 0;
+   fIfinBits = 0;
 }
 
-void TFipps::ResetAddback()
+void TIfin::ResetAddback()
 {
    SetAddback(false);
    SetCrossTalk(false);
@@ -468,13 +475,13 @@ void TFipps::ResetAddback()
    GetAddbackFragVector().clear();
 }
 
-void TFipps::ResetSuppressed()
+void TIfin::ResetSuppressed()
 {
     SetSuppressed(false);
     GetSuppressedVector().clear();
 }
 
-void TFipps::ResetSuppressedAddback()
+void TIfin::ResetSuppressedAddback()
 {
    SetAddback(false);
    SetCrossTalk(false);
@@ -483,7 +490,7 @@ void TFipps::ResetSuppressedAddback()
    GetSuppressedAddbackFragVector().clear();
 }
 
-UShort_t TFipps::GetNAddbackFrags(const size_t& idx)
+UShort_t TIfin::GetNAddbackFrags(const size_t& idx)
 {
    // Get the number of addback "fragments" contributing to the total addback hit
    // with index idx.
@@ -493,21 +500,20 @@ UShort_t TFipps::GetNAddbackFrags(const size_t& idx)
    return 0;
 }
 
-void TFipps::SetBitNumber(enum EFippsBits bit, Bool_t set) const
+void TIfin::SetBitNumber(enum EIfinBits bit, Bool_t set) const
 {
-   // Used to set the flags that are stored in TFipps.
-   fFippsBits.SetBit(bit, set);
+   // Used to set the flags that are stored in TIfin.
+   fIfinBits.SetBit(bit, set);
 }
 
-
-Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const TFippsHit* const other_hit,
+Double_t TIfin::CTCorrectedEnergy(const TIfinHit* const hit_to_correct, const TIfinHit* const other_hit,
                                    Bool_t time_constraint)
 {
 	/// Corrects the energy of the hit to correct by ADDING the uncorrected energy of the other hit times the parameter for this combination
 	/// This is different to the very similar TGriffin function that SUBTRACTS instead of ADDING.
 	/// If time_constraint is true it also checks that the two hits are within the addback window to each other.
 	if((hit_to_correct == nullptr) || (other_hit == nullptr)) {
-		std::cerr<<"One of the hits is invalid in TFipps::CTCorrectedEnergy"<<std::endl;
+		std::cerr<<"One of the hits is invalid in TIfin::CTCorrectedEnergy"<<std::endl;
 		return 0;
 	}
 
@@ -519,21 +525,21 @@ Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const 
 		}
 	}
 
-   if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
-      return hit_to_correct->GetEnergy();
-   }
+	if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
+		return hit_to_correct->GetEnergy();
+	}
 	static bool been_warned[256] = {false};
 	double      fixed_energy     = hit_to_correct->GetEnergy();
 	try {
 		if(hit_to_correct->GetChannel() != nullptr) {
-			fixed_energy -= hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
+			fixed_energy += hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
 		}
 	} catch(const std::out_of_range& oor) {
 		int id = 16 * hit_to_correct->GetDetector() + 4 * hit_to_correct->GetCrystal() + other_hit->GetCrystal();
 		if(!been_warned[id]) {
 			been_warned[id] = true;
 			std::cerr<<DRED<<"Missing CT correction for Det: "<<hit_to_correct->GetDetector()
-				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<RESET_COLOR<<std::endl;
+				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<std::endl;
 		}
 		return hit_to_correct->GetEnergy();
 	}
@@ -541,31 +547,29 @@ Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const 
 	return fixed_energy;
 }
 
-void TFipps::FixCrossTalk()
+void TIfin::FixCrossTalk()
 {
-   if(!TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) return;
-
    auto hit_vec = GetHitVector();
    if(hit_vec.size() < 2) {
       SetCrossTalk(true);
       return;
    }
-   for(auto& hit : hit_vec) {
-      static_cast<TFippsHit*>(hit)->ClearEnergy();
+   for(auto& i : hit_vec) {
+      i->ClearEnergy();
    }
 
    if(TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) {
 		for(auto& one : hit_vec) {
 			for(auto& two : hit_vec) {
 				if(one == two) continue;
-				one->SetEnergy(TFipps::CTCorrectedEnergy(static_cast<TFippsHit*>(one), static_cast<TFippsHit*>(two)));
+				one->SetEnergy(TIfin::CTCorrectedEnergy(static_cast<TIfinHit*>(one), static_cast<TIfinHit*>(two)));
 			}
 		}
    }
    SetCrossTalk(true);
 }
 
-const char* TFipps::GetColorFromNumber(int number)
+const char* TIfin::GetColorFromNumber(int number)
 {
 	switch(number) {
 		case 0: return "R";

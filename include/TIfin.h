@@ -1,5 +1,5 @@
-#ifndef TFIPPS_H
-#define TFIPPS_H
+#ifndef TIFIN_H
+#define TIFIN_H
 
 /** \addtogroup Detectors
  *  @{
@@ -15,23 +15,23 @@
 #include "TVector3.h"
 
 #include "Globals.h"
-#include "TFippsHit.h"
+#include "TIfinHit.h"
 #include "TSuppressed.h"
 #include "TTransientBits.h"
 
 ////////////////////////////////////////////////////////////
 ///
-/// \class TFipps
+/// \class TIfin
 ///
-/// The TFipps class defines the observables and algorithms used
-/// when analyzing FIPPS data. It includes detector positions,
+/// The TIfin class defines the observables and algorithms used
+/// when analyzing IFIN data. It includes detector positions,
 /// add-back methods, etc.
 ///
 ////////////////////////////////////////////////////////////
 
-class TFipps : public TSuppressed {
+class TIfin : public TSuppressed {
 public:
-   enum class EFippsBits {
+   enum class EIfinBits {
       kIsAddbackSet             = 1<<0,
       kIsCrossTalkSet           = 1<<1,
       kIsSuppressedSet          = 1<<2,
@@ -42,12 +42,12 @@ public:
       kBit7                     = 1<<7
    };
 
-   TFipps();
-   TFipps(const TFipps&);
-   ~TFipps() override;
+   TIfin();
+   TIfin(const TIfin&);
+   ~TIfin() override;
 
 public:
-   TFippsHit* GetFippsHit(const Int_t& i);
+   TIfinHit* GetIfinHit(const Int_t& i);
 
    static TVector3 GetPosition(int DetNbr, int CryNbr = 5, double dist = 90.0); //!<!
    static const char* GetColorFromNumber(int number);
@@ -56,7 +56,7 @@ public:
 #endif
    void ResetFlags() const;
 
-   TFipps& operator=(const TFipps&); //!<!
+   TIfin& operator=(const TIfin&); //!<!
 
 #if !defined(__CINT__) && !defined(__CLING__)
    void SetAddbackCriterion(std::function<bool(const TDetectorHit*, const TDetectorHit*)> criterion)
@@ -69,14 +69,14 @@ public:
 #endif
 
    Int_t      GetAddbackMultiplicity();
-   TFippsHit* GetAddbackHit(const int& i);
+   TIfinHit* GetAddbackHit(const int& i);
    bool       IsAddbackSet() const;
    void       ResetAddback();
    void       ResetSuppressed();
    void       ResetSuppressedAddback();
    UShort_t   GetNAddbackFrags(const size_t& idx);
 
-   TFippsHit* GetSuppressedHit(const int& i);
+   TIfinHit* GetSuppressedHit(const int& i);
    Int_t      GetSuppressedMultiplicity( const TBgo* bgo );
    bool       IsSuppressed() const;
 
@@ -90,9 +90,9 @@ public:
    bool SuppressionCriterion(const TDetectorHit* hit, const TDetectorHit* bgoHit) override { return fSuppressionCriterion(hit, bgoHit); }
 #endif
 
-   TFippsHit* GetSuppressedAddbackHit(const int& i);
-   Int_t            GetSuppressedAddbackMultiplicity(const TBgo* bgo);
-   bool IsSuppressedAddbackSet() const;
+   TIfinHit* GetSuppressedAddbackHit( const int& i );
+   Int_t      GetSuppressedAddbackMultiplicity(const TBgo* bgo);
+   bool       IsSuppressedAddbackSet() const;
 
 private:
 #if !defined(__CINT__) && !defined(__CLING__)
@@ -102,7 +102,7 @@ private:
 
    // static bool fSetBGOHits;                //!<!  Flag that determines if BGOHits are being measured
 
-   mutable TTransientBits<UChar_t> fFippsBits; // Transient member flags
+   mutable TTransientBits<UChar_t> fIfinBits; // Transient member flags
 
    mutable std::vector<TDetectorHit*> fAddbackHits;  //!<! Used to create addback hits on the fly
    mutable std::vector<UShort_t>  fAddbackFrags; //!<! Number of crystals involved in creating in the addback hit
@@ -115,13 +115,16 @@ public:
 
 private:
    static TVector3 gCloverPosition[17];                    //!<! Position of each HPGe Clover
-   void            ClearStatus() const { fFippsBits = 0; } //!<!
-   void SetBitNumber(EFippsBits bit, Bool_t set) const;
-   Bool_t TestBitNumber(EFippsBits bit) const { return fFippsBits.TestBit(bit); }
+   void            ClearStatus() const { fIfinBits = 0; } //!<!
+   void SetBitNumber(EIfinBits bit, Bool_t set) const;
+   Bool_t TestBitNumber(EIfinBits bit) const { return fIfinBits.TestBit(bit); }
 
    // Cross-Talk stuff
 public:
-   static Double_t CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const TFippsHit* const other_hit,
+   static const Double_t gStrongCT[2];           //!<!
+   static const Double_t gWeakCT[2];             //!<!
+   static const Double_t gCrossTalkPar[2][4][4]; //!<!
+   static Double_t CTCorrectedEnergy(const TIfinHit* const hit_to_correct, const TIfinHit* const other_hit,
                                      Bool_t time_constraint = true);
    Bool_t IsCrossTalkSet() const;
    void   FixCrossTalk();
@@ -142,10 +145,9 @@ public:
    void Copy(TObject&) const override;            //!<!
    void Clear(Option_t* opt = "all") override;    //!<!
    void Print(Option_t* opt = "") const override; //!<!
-	void Print(std::ostream& out) const override;
 
    /// \cond CLASSIMP
-   ClassDefOverride(TFipps, 7) // Fipps Physics structure
+   ClassDefOverride(TIfin, 1) // Ifin Physics structure
    /// \endcond
 };
 /*! @} */

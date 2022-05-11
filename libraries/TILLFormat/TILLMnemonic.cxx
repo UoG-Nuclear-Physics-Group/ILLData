@@ -9,6 +9,8 @@
 #include "TFippsLaBrBgo.h"
 #include "TFippsTAC.h"
 #include "TFippsPulser.h"
+#include "TIfin.h"
+#include "TIfinBgo.h"
 
 ClassImp(TILLMnemonic)
 
@@ -27,6 +29,12 @@ void TILLMnemonic::EnumerateSystem()
          fSystem = ESystem::kFippsBgo;
       } else {
           fSystem = ESystem::kFipps;
+      }
+   } else if(fSystemString.compare("IF") == 0) {
+      if(SubSystem() == EMnemonic::kS) {
+         fSystem = ESystem::kIfinBgo;
+      } else {
+          fSystem = ESystem::kIfin;
       }
    } else if(fSystemString.compare("LB") == 0) {
        if(SubSystem() == EMnemonic::kS ) {
@@ -51,17 +59,17 @@ void TILLMnemonic::EnumerateDigitizer(TPriorityValue<std::string>& digitizerName
 	int tmpUnit = 10;
 	if(name.compare("V1724") == 0) {
 		tmpType = EDigitizer::kV1724;
-        tmpUnit = 10;
+		tmpUnit = 10;
 	} else if(name.compare("V1725") == 0) {
-        tmpType = EDigitizer::kV1725;
-        tmpUnit = 4; // ns
-    } else if(name.compare("V1730") == 0) {
-        tmpType = EDigitizer::kV1730;
-        tmpUnit = 2; // ns
-    } else if(name.compare("V1751") == 0) {
-        tmpType = EDigitizer::kV1751;
-        tmpUnit = 1; // ns
-    } else {
+		tmpType = EDigitizer::kV1725;
+		tmpUnit = 4; // ns
+	} else if(name.compare("V1730") == 0) {
+		tmpType = EDigitizer::kV1730;
+		tmpUnit = 2; // ns
+	} else if(name.compare("V1751") == 0) {
+		tmpType = EDigitizer::kV1751;
+		tmpUnit = 1; // ns
+	} else {
 		std::cout<<"Warning, digitizer type '"<<name<<"' not recognized, options are 'V1724', 'V1725', 'V1730', and 'V1751'!"<<std::endl;
 	}
 	digitizerType.Set(tmpType, digitizerName.Priority());
@@ -100,12 +108,14 @@ TClass* TILLMnemonic::GetClassType() const
 
 	switch(System()) {
 		case ESystem::kFipps:        fClassType = TFipps::Class(); break;
-        case ESystem::kFippsBgo:     fClassType = TFippsBgo::Class(); break;
-        case ESystem::kFippsLaBr:    fClassType = TFippsLaBr::Class(); break;
-        case ESystem::kFippsLaBrBgo: fClassType = TFippsLaBrBgo::Class(); break;
-        case ESystem::kFippsTAC:     fClassType = TFippsTAC::Class(); break;
-        case ESystem::kFippsPulser:  fClassType = TFippsPulser::Class(); break;
-		default:              fClassType = nullptr;
+		case ESystem::kFippsBgo:     fClassType = TFippsBgo::Class(); break;
+		case ESystem::kFippsLaBr:    fClassType = TFippsLaBr::Class(); break;
+		case ESystem::kFippsLaBrBgo: fClassType = TFippsLaBrBgo::Class(); break;
+		case ESystem::kFippsTAC:     fClassType = TFippsTAC::Class(); break;
+		case ESystem::kFippsPulser:  fClassType = TFippsPulser::Class(); break;
+		case ESystem::kIfin:         fClassType = TIfin::Class(); break;
+		case ESystem::kIfinBgo:      fClassType = TIfinBgo::Class(); break;
+		default:                     fClassType = nullptr;
 	};
 	return fClassType;
 }

@@ -24,7 +24,9 @@ public:
       kFippsLaBrBgo,    //3
       kFippsTAC,        //4
       kFippsPulser,     //5
-      kClear            //6
+      kIfin,            //6
+      kIfinBgo,         //7
+      kClear            //8
    };
 
    ESystem   System() const { return fSystem; }
