@@ -33,7 +33,6 @@ public:
    static bool CompareEnergy(const TFippsHit*, const TFippsHit*); //!<!
    void        Add(const TDetectorHit*) override;             //!<!
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
 	void Print(std::ostream& out) const override;
