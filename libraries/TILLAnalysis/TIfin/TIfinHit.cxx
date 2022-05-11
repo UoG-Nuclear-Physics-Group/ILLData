@@ -9,7 +9,7 @@ ClassImp(TIfinHit)
 /// \endcond
 
 TIfinHit::TIfinHit()
-	: TILLDetectorHit()
+	: TDetectorHit()
 {
 	// Default Ctor. Ignores TObject Streamer in ROOT < 6.
 #if MAJOR_ROOT_VERSION < 6
@@ -18,14 +18,14 @@ TIfinHit::TIfinHit()
 	Clear();
 }
 
-TIfinHit::TIfinHit(const TIfinHit& rhs) : TILLDetectorHit()
+TIfinHit::TIfinHit(const TIfinHit& rhs) : TDetectorHit()
 {
 	// Copy Ctor. Ignores TObject Streamer in ROOT < 6.
 	Clear();
 	rhs.Copy(*this);
 }
 
-TIfinHit::TIfinHit(const TFragment& frag) : TILLDetectorHit(frag)
+TIfinHit::TIfinHit(const TFragment& frag) : TDetectorHit(frag)
 {
 }
 
@@ -33,7 +33,7 @@ TIfinHit::~TIfinHit() = default;
 
 void TIfinHit::Copy(TObject& rhs) const
 {
-	TILLDetectorHit::Copy(rhs);
+	TDetectorHit::Copy(rhs);
 }
 
 void TIfinHit::Copy(TObject& obj, bool) const
@@ -44,7 +44,7 @@ void TIfinHit::Copy(TObject& obj, bool) const
 void TIfinHit::Clear(Option_t* opt)
 {
 	// Clears the information stored in the TIfinHit.
-	TILLDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+	TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
 }
 
 void TIfinHit::Print(Option_t*) const

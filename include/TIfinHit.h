@@ -12,9 +12,9 @@
 
 #include "TFragment.h"
 #include "TChannel.h"
-#include "TILLDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TIfinHit : public TILLDetectorHit {
+class TIfinHit : public TDetectorHit {
 public:
    TIfinHit();
    TIfinHit(const TIfinHit&);
