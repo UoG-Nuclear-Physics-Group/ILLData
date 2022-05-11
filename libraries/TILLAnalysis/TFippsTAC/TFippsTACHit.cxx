@@ -14,7 +14,7 @@ ClassImp(TFippsTACHit)
 TFippsTACHit::TFippsTACHit()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -22,10 +22,10 @@ TFippsTACHit::TFippsTACHit()
 
 TFippsTACHit::~TFippsTACHit() = default;
 
-TFippsTACHit::TFippsTACHit(const TFippsTACHit& rhs) : TILLDetectorHit()
+TFippsTACHit::TFippsTACHit(const TFippsTACHit& rhs) : TDetectorHit()
 {
 	// Copy Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -35,8 +35,12 @@ TFippsTACHit::TFippsTACHit(const TFippsTACHit& rhs) : TILLDetectorHit()
 void TFippsTACHit::Copy(TObject& rhs) const
 {
 	// Copies a TFippsTACHit
-	TILLDetectorHit::Copy(rhs);
-	static_cast<TFippsTACHit&>(rhs).fFilter = fFilter;
+	TDetectorHit::Copy(rhs);
+}
+
+void TFippsTACHit::Copy(TObject& obj, bool) const
+{
+	Copy(obj);
 }
 
 Double_t TFippsTACHit::GetTempCorrectedCharge(TGraph* correction_graph) const {
@@ -75,19 +79,10 @@ Double_t TFippsTACHit::GetTempCorrectedEnergy(TGraph* correction_graph) const {
 	return channel->CalibrateENG(TempCorrectedCharge(correction_graph));
 }
 
-bool TFippsTACHit::InFilter(Int_t)
-{
-	// check if the desired filter is in wanted filter;
-	// return the answer;
-	// currently does nothing
-	return true;
-}
-
 void TFippsTACHit::Clear(Option_t*)
 {
 	// Clears the TACHit
-	fFilter = 0;
-	TILLDetectorHit::Clear();
+	TDetectorHit::Clear();
 }
 
 void TFippsTACHit::Print(Option_t*) const
@@ -96,7 +91,14 @@ void TFippsTACHit::Print(Option_t*) const
 	// Detector
 	// Energy
 	// Time
-	printf("TAC Detector: %i\n", GetDetector());
-	printf("TAC hit energy: %.2f\n", GetEnergy());
-	printf("TAC hit time:   %.lf\n", GetTime());
+	Print(std::cout);
+}
+
+void TFippsTACHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"TAC Detector:   "<<GetDetector()<<std::endl;
+	str<<"TAC hit energy: "<<GetEnergy()<<std::endl;
+	str<<"TAC hit time:   "<<GetTime()<<std::endl;
+	out<<str.str();
 }

@@ -10,7 +10,7 @@ ClassImp(TFippsTAC)
 TFippsTAC::TFippsTAC()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -24,7 +24,7 @@ TFippsTAC::~TFippsTAC()
 TFippsTAC::TFippsTAC(const TFippsTAC& rhs) : TDetector()
 {
 	// Copy Contructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	rhs.Copy(*this);
@@ -39,11 +39,18 @@ TFippsTAC& TFippsTAC::operator=(const TFippsTAC& rhs)
 void TFippsTAC::Print(Option_t*) const
 {
 	// Prints out TFippsTAC Multiplicity, currently does little.
-	printf("%lu fHits\n", fHits.size());
+	Print(std::cout);
+}
+
+void TFippsTAC::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 void TFippsTAC::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 	TFippsTACHit* hit = new TFippsTACHit(*frag);
-	fHits.push_back(std::move(hit));
+	fHits.push_back(hit);
 }

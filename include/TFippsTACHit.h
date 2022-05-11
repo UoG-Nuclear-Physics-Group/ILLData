@@ -23,38 +23,27 @@
 
 #include "TVector3.h"
 
-#include "TILLDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TFippsTACHit : public TILLDetectorHit {
+class TFippsTACHit : public TDetectorHit {
 public:
    TFippsTACHit();
    ~TFippsTACHit() override;
    TFippsTACHit(const TFippsTACHit&);
-   TFippsTACHit(const TFragment& frag) : TILLDetectorHit(frag) {}
-
-private:
-   Int_t fFilter{0};
-
-public:
-   /////////////////////////		/////////////////////////////////////
-   inline void SetFilterPattern(const int& x) { fFilter = x; } //!<!
-
-   /////////////////////////		/////////////////////////////////////
-   inline Int_t GetFilterPattern() const { return fFilter; } //!<!
-
-   bool InFilter(Int_t); //!<!
+   TFippsTACHit(const TFragment& frag) : TDetectorHit(frag) {}
 
    Double_t GetTempCorrectedCharge(TGraph* correction_graph) const;
    Double_t TempCorrectedCharge(TGraph* correction_graph) const;
    Double_t GetTempCorrectedEnergy(TGraph* correction_graph) const;
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override;
    void Copy(TObject&) const override;            //!<!
+   void Copy(TObject&, bool) const override;      //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TFippsTACHit, 1) // Stores the information for a TACrHit
+   ClassDefOverride(TFippsTACHit, 2) // Stores the information for a TACrHit
    /// \endcond
 };
 /*! @} */

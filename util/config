@@ -41,9 +41,14 @@ fi
 libdir=$GRSISYS/ILLData/lib
 incdir=$GRSISYS/ILLData/include
 
-libs="-lTFippsLaBr -lTFippsPulser -lTFipps -lTFippsTAC -lTIfin -lTILLAnalysis -lTILLDataParser -lTILLDetector -lTILLFormat -lTLst"
+libs="-lTFippsLaBr -lTFippsPulser -lTFipps -lTFippsTAC -lTILLAnalysis -lTILLDataParser -lTILLFormat -lTLst"
 
-cflags="-std=c++0x -I$incdir"
+if [[ $(root-config --cflags) == *"-std="* ]]
+then
+	cflags="-I$incdir"
+else
+	cflags="-std=c++11 -I$incdir"
+fi
 
 usage="\
 Usage: grsi-config [--version] [--incdir] [--cflags] [--libs] [--help]"

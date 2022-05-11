@@ -89,15 +89,15 @@ void TILLMnemonic::Parse(std::string* name)
 
 void TILLMnemonic::Print(Option_t*) const
 {
-	printf("====== ILLMNEMONIC ======\n");
-	printf("fArrayPosition           = %i\n", fArrayPosition);
-	printf("fSegment                 = %i\n", fSegment);
-	printf("fSystemString            = %s\n", fSystemString.c_str());
-	printf("fSubSystemString         = %s\n", fSubSystemString.c_str());
-	printf("fArraySubPositionString  = %s\n", fArraySubPositionString.c_str());
-	printf("fCollectedChargeString   = %s\n", fCollectedChargeString.c_str());
-	printf("fOutputSensorString      = %s\n", fOutputSensorString.c_str());
-	printf("===============================\n");
+	std::cout<<"====== ILLMNEMONIC ======"<<std::endl;
+	std::cout<<"fArrayPosition           = "<<fArrayPosition<<std::endl;
+	std::cout<<"fSegment                 = "<<fSegment<<std::endl;
+	std::cout<<"fSystemString            = "<<fSystemString<<std::endl;
+	std::cout<<"fSubSystemString         = "<<fSubSystemString<<std::endl;
+	std::cout<<"fArraySubPositionString  = "<<fArraySubPositionString<<std::endl;
+	std::cout<<"fCollectedChargeString   = "<<fCollectedChargeString<<std::endl;
+	std::cout<<"fOutputSensorString      = "<<fOutputSensorString<<std::endl;
+	std::cout<<"========================="<<std::endl;
 }
 
 TClass* TILLMnemonic::GetClassType() const
@@ -118,4 +118,14 @@ TClass* TILLMnemonic::GetClassType() const
 		default:                     fClassType = nullptr;
 	};
 	return fClassType;
+}
+
+double TILLMnemonic::GetTime(Long64_t timestamp, Float_t, double energy, const TChannel* channel) const
+{
+	if(channel == nullptr) {
+      Error("GetTime", "No TChannel provided");
+      return static_cast<Double_t>((timestamp) + gRandom->Uniform());
+   }
+	Double_t dTime = static_cast<Double_t>((timestamp) + gRandom->Uniform()) * channel->GetTimeStampUnit();
+	return dTime - channel->GetTZero(energy);
 }

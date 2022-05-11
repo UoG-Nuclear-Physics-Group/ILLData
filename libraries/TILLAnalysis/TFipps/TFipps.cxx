@@ -100,7 +100,7 @@ TVector3 TFipps::gCloverPosition[17] = {
 TFipps::TFipps() : TSuppressed()
 {
 // Default ctor. Ignores TObjectStreamer in ROOT < 6
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -109,7 +109,7 @@ TFipps::TFipps() : TSuppressed()
 TFipps::TFipps(const TFipps& rhs) : TSuppressed()
 {
 // Copy ctor. Ignores TObjectStreamer in ROOT < 6
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    rhs.Copy(*this);
@@ -159,18 +159,23 @@ void TFipps::Clear(Option_t* opt)
 
 void TFipps::Print(Option_t*) const
 {
-   std::cout<<"Fipps Contains: "<<std::endl;
-   std::cout<<std::setw(6)<<GetMultiplicity()<<" hits"<<std::endl;
+	Print(std::cout);
+}
+
+void TFipps::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"Fipps Contains: "<<std::endl;
+   str<<std::setw(6)<<GetMultiplicity()<<" hits"<<std::endl;
 
    if(IsAddbackSet()) {
-      std::cout<<std::setw(6)<<fAddbackHits.size()<<" addback hits"<<std::endl;
+      str<<std::setw(6)<<fAddbackHits.size()<<" addback hits"<<std::endl;
    } else {
-      std::cout<<std::setw(6)<<" "
-               <<" Addback not set"<<std::endl;
+      str<<std::setw(6)<<" "<<" Addback not set"<<std::endl;
    }
 
-   std::cout<<std::setw(6)<<" "
-            <<" Cross-talk Set?  "<<IsCrossTalkSet()<<std::endl;
+   str<<std::setw(6)<<" "<<" Cross-talk Set?  "<<IsCrossTalkSet()<<std::endl;
+	out<<str.str();
 }
 
 TFipps& TFipps::operator=(const TFipps& rhs)
@@ -403,8 +408,8 @@ void TFipps::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*
    switch(chan->GetMnemonic()->SubSystem()) {
 		case TMnemonic::EMnemonic::kG: 
 			{
-				auto geHit = new TFippsHit(*frag);
-				fHits.push_back(std::move(geHit));
+				auto hit = new TFippsHit(*frag);
+				fHits.push_back(hit);
 			}
 			break;
 		default:
@@ -494,6 +499,7 @@ void TFipps::SetBitNumber(enum EFippsBits bit, Bool_t set) const
    fFippsBits.SetBit(bit, set);
 }
 
+
 Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const TFippsHit* const other_hit,
                                    Bool_t time_constraint)
 {
@@ -513,21 +519,21 @@ Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const 
 		}
 	}
 
-	if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
-		return hit_to_correct->GetEnergy();
-	}
+   if(hit_to_correct->GetDetector() != other_hit->GetDetector()) {
+      return hit_to_correct->GetEnergy();
+   }
 	static bool been_warned[256] = {false};
 	double      fixed_energy     = hit_to_correct->GetEnergy();
 	try {
 		if(hit_to_correct->GetChannel() != nullptr) {
-			fixed_energy += hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
+			fixed_energy -= hit_to_correct->GetChannel()->GetCTCoeff().at(other_hit->GetCrystal()) * other_hit->GetNoCTEnergy();
 		}
 	} catch(const std::out_of_range& oor) {
 		int id = 16 * hit_to_correct->GetDetector() + 4 * hit_to_correct->GetCrystal() + other_hit->GetCrystal();
 		if(!been_warned[id]) {
 			been_warned[id] = true;
 			std::cerr<<DRED<<"Missing CT correction for Det: "<<hit_to_correct->GetDetector()
-				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<std::endl;
+				<<" Crystals: "<<hit_to_correct->GetCrystal()<<" "<<other_hit->GetCrystal()<<" (id "<<id<<")"<<RESET_COLOR<<std::endl;
 		}
 		return hit_to_correct->GetEnergy();
 	}
@@ -537,13 +543,15 @@ Double_t TFipps::CTCorrectedEnergy(const TFippsHit* const hit_to_correct, const 
 
 void TFipps::FixCrossTalk()
 {
+   if(!TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) return;
+
    auto hit_vec = GetHitVector();
    if(hit_vec.size() < 2) {
       SetCrossTalk(true);
       return;
    }
-   for(auto& i : hit_vec) {
-      i->ClearEnergy();
+   for(auto& hit : hit_vec) {
+      static_cast<TFippsHit*>(hit)->ClearEnergy();
    }
 
    if(TGRSIOptions::AnalysisOptions()->IsCorrectingCrossTalk()) {

@@ -12,9 +12,9 @@
 
 #include "TFragment.h"
 #include "TChannel.h"
-#include "TILLDetectorHit.h"
+#include "TDetectorHit.h"
 
-class TFippsHit : public TILLDetectorHit {
+class TFippsHit : public TDetectorHit {
 public:
    TFippsHit();
    TFippsHit(const TFippsHit&);
@@ -33,9 +33,9 @@ public:
    static bool CompareEnergy(const TFippsHit*, const TFippsHit*); //!<!
    void        Add(const TDetectorHit*) override;             //!<!
 
-public:
    void Clear(Option_t* opt = "") override;       //!<!
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override;
    void Copy(TObject&) const override;            //!<!
    void Copy(TObject&, bool) const override;      //!<!
 

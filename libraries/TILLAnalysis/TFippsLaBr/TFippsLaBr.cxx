@@ -34,7 +34,7 @@ TVector3 TFippsLaBr::gPosition[9] = {
 TFippsLaBr::TFippsLaBr()
 {
 	// Default Constructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
@@ -49,7 +49,7 @@ TFippsLaBr::~TFippsLaBr()
 TFippsLaBr::TFippsLaBr(const TFippsLaBr& rhs) : TSuppressed()
 {
 	// Copy Contructor
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	rhs.Copy(*this);
@@ -85,7 +85,14 @@ TFippsLaBr& TFippsLaBr::operator=(const TFippsLaBr& rhs)
 void TFippsLaBr::Print(Option_t*) const
 {
 	// Prints out TFippsLaBr Multiplicity, currently does little.
-	printf("%lu fHits\n", fHits.size());
+	Print(std::cout);
+}
+
+void TFippsLaBr::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<fHits.size()<<" fHits"<<std::endl;
+	out<<str.str();
 }
 
 bool TFippsLaBr::IsSuppressed() const
@@ -141,6 +148,6 @@ TFippsLaBrHit* TFippsLaBr::GetSuppressedHit(const int& i)
 
 void TFippsLaBr::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
-	TFippsLaBrHit* laHit = new TFippsLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
-	fHits.push_back(std::move(laHit)); // use std::move for efficienciy since laHit loses scope here anyway
+	TFippsLaBrHit* hit = new TFippsLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
+	fHits.push_back(hit);
 }

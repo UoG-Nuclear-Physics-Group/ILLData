@@ -15,8 +15,6 @@ SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
 
-MAJOR_ROOT_VERSION:=$(shell root-config --version | cut -d '.' -f1)
-MINOR_ROOT_VERSION:=$(shell root-config --version | cut -d '.' -f2 | cut -d '/' -f1)
 ROOT_PYTHON_VERSION=$(shell root-config --python-version)
 
 MATHMORE_INSTALLED:=$(shell root-config --has-mathmore)
@@ -32,7 +30,6 @@ lib_o_files     = $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(call lib_src_files,$(1
 lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
 lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_linkdef,$(1)))
 	
-CFLAGS += -DMAJOR_ROOT_VERSION=${MAJOR_ROOT_VERSION}
 ifeq ($(ROOT_PYTHON_VERSION),2.7)
   CFLAGS += -DHAS_CORRECT_PYTHON_VERSION
 endif
@@ -117,7 +114,7 @@ EXECUTABLES     := $(patsubst %.o,$(GRSISYS)/bin/%,$(notdir $(EXE_O_FILES)))
 
 HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
 FILTER_SO    := $(patsubst filters/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard filters/*.$(SRC_SUFFIX)))
-HIST_LIBS = -lTILLDetector
+HIST_LIBS = 
 
 ifdef VERBOSE
 run_and_test = @echo $(1) && $(1);
@@ -165,7 +162,7 @@ lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | include/ILLDataV
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) $(GRSI_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 lib/libILLData.so: $(LIBRARY_OUTPUT) $(MAIN_O_FILES) | include/ILLDataVersion.h
-	$(call run_and_test,$(CPP) -fPIC $(shell $(FIND) .build/libraries -name "*.o") $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) $(GRSI_LIBFLAGS) $(MAIN_O_FILES) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) -fPIC $(shell $(FIND) .build/libraries -name "*.o") $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) $(MAIN_O_FILES) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 .build/%.o: %.$(SRC_SUFFIX)
 	@mkdir -p $(dir $@)

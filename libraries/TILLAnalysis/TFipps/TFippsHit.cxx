@@ -9,23 +9,23 @@ ClassImp(TFippsHit)
 /// \endcond
 
 TFippsHit::TFippsHit()
-	: TILLDetectorHit()
+	: TDetectorHit()
 {
 	// Default Ctor. Ignores TObject Streamer in ROOT < 6.
-#if MAJOR_ROOT_VERSION < 6
+#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
 	Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
 	Clear();
 }
 
-TFippsHit::TFippsHit(const TFippsHit& rhs) : TILLDetectorHit()
+TFippsHit::TFippsHit(const TFippsHit& rhs) : TDetectorHit()
 {
 	// Copy Ctor. Ignores TObject Streamer in ROOT < 6.
 	Clear();
 	rhs.Copy(*this);
 }
 
-TFippsHit::TFippsHit(const TFragment& frag) : TILLDetectorHit(frag)
+TFippsHit::TFippsHit(const TFragment& frag) : TDetectorHit(frag)
 {
 }
 
@@ -33,7 +33,7 @@ TFippsHit::~TFippsHit() = default;
 
 void TFippsHit::Copy(TObject& rhs) const
 {
-	TILLDetectorHit::Copy(rhs);
+	TDetectorHit::Copy(rhs);
 }
 
 void TFippsHit::Copy(TObject& obj, bool) const
@@ -44,18 +44,24 @@ void TFippsHit::Copy(TObject& obj, bool) const
 void TFippsHit::Clear(Option_t* opt)
 {
 	// Clears the information stored in the TFippsHit.
-	TILLDetectorHit::Clear(opt); // clears the base (address, position and waveform)
+	TDetectorHit::Clear(opt); // clears the base (address, position and waveform)
 }
 
 void TFippsHit::Print(Option_t*) const
 {
 	// Prints the Detector Number, Crystal Number, Energy, Time and Angle.
-	printf("Fipps Detector: %i\n", GetDetector());
-	printf("Fipps Crystal:  %i\n", GetCrystal());
-	printf("Fipps Energy:   %lf\n", GetEnergy());
-	printf("Fipps hit time:   %lf\n", GetTime());
-	printf("Fipps hit TV3 theta: %.2f\tphi%.2f\n", GetPosition().Theta() * 180 / (3.141597),
-			GetPosition().Phi() * 180 / (3.141597));
+	Print(std::cout);
+}
+
+void TFippsHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<"Fipps Detector: "<<GetDetector()<<std::endl;
+	str<<"Fipps Crystal:  "<<GetCrystal()<<std::endl;
+	str<<"Fipps Energy:   "<<GetEnergy()<<std::endl;
+	str<<"Fipps hit time: "<<GetTime()<<std::endl;
+	str<<"Fipps hit TV3 theta: "<<GetPosition().Theta() * 180./3.141597<<"\tphi"<<GetPosition().Phi() * 180./3.141597<<std::endl;
+	out<<str.str();
 }
 
 TVector3 TFippsHit::GetPosition(double dist) const

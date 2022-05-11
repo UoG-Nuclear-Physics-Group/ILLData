@@ -189,7 +189,7 @@ void TLstFile::Skip(size_t)
 
 int TLstFile::GetRunNumber()
 {
-   // Parse the run number from the current TMidasFile. This assumes a format of
+   // Parse the run number from the current TLstFile. This assumes a format of
    // run#####_###.lst or run#####.lst.
    if(fFilename.length() == 0) {
       return 0;
@@ -203,7 +203,6 @@ int TLstFile::GetRunNumber()
    if((found2 < foundslash && foundslash != std::string::npos) || found2 == std::string::npos) {
       found2 = fFilename.rfind('_');
    }
-   //   printf("found 2 = %i\n",found2);
    if(found2 < foundslash && foundslash != std::string::npos) {
       found2 = std::string::npos;
    }
@@ -213,7 +212,6 @@ int TLstFile::GetRunNumber()
    } else {
       temp = fFilename.substr(found - 9, 5);
    }
-   // printf(" %s \t %i \n",temp.c_str(),atoi(temp.c_str()));
    return atoi(temp.c_str());
 }
 

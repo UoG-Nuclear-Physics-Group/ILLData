@@ -37,11 +37,18 @@ void TFippsPulser::AddFragment(const std::shared_ptr<const TFragment>& frag, TCh
       return;
    }
 
-   TILLDetectorHit* dethit = new TILLDetectorHit(*frag);
-   fHits.push_back(std::move(dethit));
+   auto hit = new TDetectorHit(*frag);
+   fHits.push_back(hit);
 }
 
 void TFippsPulser::Print(Option_t*) const
 {
-   printf("%s\tnot yet written.\n", __PRETTY_FUNCTION__);
+	Print(std::cout);
+}
+
+void TFippsPulser::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl;
+	out<<str.str();
 }

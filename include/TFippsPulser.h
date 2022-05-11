@@ -9,7 +9,7 @@
 
 #include "TDetector.h"
 #include "TChannel.h"
-#include "TILLDetectorHit.h"
+#include "TDetectorHit.h"
 
 class TFippsPulser : public TDetector {
 public:
@@ -23,10 +23,9 @@ public:
 #endif
 	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
 
-   TILLDetectorHit* GetGenericDetectorHit(const int& i) const { return static_cast<TILLDetectorHit*>(GetHit(i)); }
-
    TFippsPulser& operator=(const TFippsPulser&);                    //
    void Print(Option_t* opt = "") const override; //!<!
+	void Print(std::ostream& out) const override;
 
 private:
    void  ClearStatus() {  }
