@@ -60,7 +60,7 @@ void TFippsHit::Print(std::ostream& out) const
 	str<<"Fipps Crystal:  "<<GetCrystal()<<std::endl;
 	str<<"Fipps Energy:   "<<GetEnergy()<<std::endl;
 	str<<"Fipps hit time: "<<GetTime()<<std::endl;
-	str<<"Fipps hit TV3 theta: "<<GetPosition().Theta() * 180./3.141597<<"\tphi"<<GetPosition().Phi() * 180./3.141597<<std::endl;
+	str<<"Fipps hit TV3 theta: "<<GetPosition().Theta() * 180./3.141597<<"\tphi: "<<GetPosition().Phi() * 180./3.141597<<std::endl;
 	out<<str.str();
 }
 
