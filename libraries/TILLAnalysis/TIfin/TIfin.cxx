@@ -171,18 +171,23 @@ void TIfin::Clear(Option_t* opt)
 
 void TIfin::Print(Option_t*) const
 {
-   std::cout<<"Ifin Contains: "<<std::endl;
-   std::cout<<std::setw(6)<<GetMultiplicity()<<" hits"<<std::endl;
+	Print(std::cout);
+}
+
+void TIfin::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+   str<<"Ifin Contains: "<<std::endl;
+   str<<std::setw(6)<<GetMultiplicity()<<" hits"<<std::endl;
 
    if(IsAddbackSet()) {
-      std::cout<<std::setw(6)<<fAddbackHits.size()<<" addback hits"<<std::endl;
+      str<<std::setw(6)<<fAddbackHits.size()<<" addback hits"<<std::endl;
    } else {
-      std::cout<<std::setw(6)<<" "
-               <<" Addback not set"<<std::endl;
+      str<<std::setw(6)<<" "<<" Addback not set"<<std::endl;
    }
 
-   std::cout<<std::setw(6)<<" "
-            <<" Cross-talk Set?  "<<IsCrossTalkSet()<<std::endl;
+   str<<std::setw(6)<<" "<<" Cross-talk Set?  "<<IsCrossTalkSet()<<std::endl;
+	out<<str.str();
 }
 
 TIfin& TIfin::operator=(const TIfin& rhs)

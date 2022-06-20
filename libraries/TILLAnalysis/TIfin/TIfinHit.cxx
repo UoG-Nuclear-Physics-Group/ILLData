@@ -50,12 +50,19 @@ void TIfinHit::Clear(Option_t* opt)
 void TIfinHit::Print(Option_t*) const
 {
 	// Prints the Detector Number, Crystal Number, Energy, Time and Angle.
-	printf("Ifin Detector: %i\n", GetDetector());
-	printf("Ifin Crystal:  %i\n", GetCrystal());
-	printf("Ifin Energy:   %lf\n", GetEnergy());
-	printf("Ifin hit time:   %lf\n", GetTime());
-	printf("Ifin hit TV3 theta: %.2f\tphi%.2f\n", GetPosition().Theta() * 180 / (3.141597),
-			GetPosition().Phi() * 180 / (3.141597));
+	Print(std::cout);
+}
+
+void TIfinHit::Print(std::ostream& out) const
+{
+	std::ostringstream str;
+	// Prints the Detector Number, Crystal Number, Energy, Time and Angle.
+	str<<"Ifin Detector: "<<GetDetector()<<std::endl;
+	str<<"Ifin Crystal:  "<<GetCrystal()<<std::endl;
+	str<<"Ifin Energy:   "<<GetEnergy()<<std::endl;
+	str<<"Ifin hit time: "<<GetTime()<<std::endl;
+	str<<"Ifin hit TV3 theta: "<<GetPosition().Theta() * 180 / (3.141597)<<"\tphi: "<<GetPosition().Phi() * 180 / (3.141597)<<std::endl;
+	out<<str.str();
 }
 
 TVector3 TIfinHit::GetPosition(double dist) const
