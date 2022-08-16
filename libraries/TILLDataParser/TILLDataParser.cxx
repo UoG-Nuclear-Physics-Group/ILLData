@@ -38,7 +38,7 @@ int TILLDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
    if(fInputSize != nullptr) *fInputSize += event->GetDataSize()/16; // 16 bytes per event, number of bytes in 32bits
 
    if(event->GetLstVersion() == 1) {
-      for( size_t i = 0; i + 3 < size/4; i += 4 ) {
+      for(size_t i = 0; i + 3 < size/4; i += 4) {
          EventsProcessed += V1SingleFippsEventToFragment(EvntData + i);
          if(fItemsPopped != nullptr && fInputSize != nullptr) {
             ++(*fItemsPopped);
@@ -46,7 +46,7 @@ int TILLDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
          }
       }
    } else {
-      for( size_t i = 0; i + 3 < size / 4; i += 4 ) {
+      for(size_t i = 0; i + 3 < size / 4; i += 4) {
          EventsProcessed += V2SingleFippsEventToFragment(EvntData + i);
          if(fItemsPopped != nullptr && fInputSize != nullptr) {
             ++(*fItemsPopped);
@@ -63,20 +63,21 @@ int TILLDataParser::V1SingleFippsEventToFragment(uint32_t* data)
    std::shared_ptr<TFragment> eventFrag       = std::make_shared<TFragment>();
    Long64_t                   tmpTimestamp;
 
-   eventFrag->SetAddress( (data[0] >> 16) & 0xffff );
+	// address is 4 bit crate, 6 bit board, and 6 bit channel
+   eventFrag->SetAddress((data[0] >> 16) & 0xffff);
 
    // Rollover, constant beween boards
    tmpTimestamp = data[0] & 0xffff;
 
    // Concatenate timestamp informatioan based on board type
-   switch(static_cast<EDigitizer>((data[0] >> 22) & 0x3F) ) {
+   switch(static_cast<EDigitizer>((data[0] >> 22) & 0x3f)) {
       case EDigitizer::kV1724: 
          tmpTimestamp = tmpTimestamp<<30;
-         tmpTimestamp |= data[1] & 0x3ffffffF; // 30 bit timestamp
+         tmpTimestamp |= data[1] & 0x3fffffff; // 30 bit timestamp
 			break;
-      case EDigitizer::kV1725_PHA:
+		case EDigitizer::kV1725_PHA: // also for 1730_PSD according to Event.h from ILL
          tmpTimestamp = tmpTimestamp<<31;
-         tmpTimestamp |= data[1] & 0x7ffffffF; // 31 bit timestamp
+         tmpTimestamp |= data[1] & 0x7fffffff; // 31 bit timestamp
 			break;
       default:
          tmpTimestamp = tmpTimestamp<<32;
@@ -87,7 +88,7 @@ int TILLDataParser::V1SingleFippsEventToFragment(uint32_t* data)
 
    int32_t Charge = (data[2] & 0x7fff);
    // Discriminate bad fragments
-   if( Charge == 0 || Charge == 0x8000 ) {
+   if(Charge == 0 || Charge == 0x8000) {
       if(fRecordDiag) {
          TParsingDiagnostics::Get()->BadFragment(99);
       }
@@ -95,7 +96,7 @@ int TILLDataParser::V1SingleFippsEventToFragment(uint32_t* data)
       return 1;
    }
    // Good event
-   eventFrag->SetCharge(static_cast<int32_t>(Charge) );
+   eventFrag->SetCharge(static_cast<int32_t>(Charge));
    if(fRecordDiag) {
       TParsingDiagnostics::Get()->GoodFragment(eventFrag);
    }
@@ -108,7 +109,7 @@ int TILLDataParser::V2SingleFippsEventToFragment(uint32_t* data)
    std::shared_ptr<TFragment> eventFrag       = std::make_shared<TFragment>();
    Long64_t                   tmpTimestamp;
 
-   eventFrag->SetAddress( (data[0] >> 16) & 0xffff );
+   eventFrag->SetAddress((data[0] >> 16) & 0xffff);
 
    // Rollover, constant beween boards
    tmpTimestamp = data[0] & 0xffff;
@@ -118,7 +119,7 @@ int TILLDataParser::V2SingleFippsEventToFragment(uint32_t* data)
 
    int32_t Charge = (data[2] & 0x7fff);
    // Discriminate bad fragments
-   if( Charge == 0 || Charge == 0x8000 ) {
+   if(Charge == 0 || Charge == 0x8000) {
       if(fRecordDiag) {
          TParsingDiagnostics::Get()->BadFragment(99);
       }
@@ -126,7 +127,7 @@ int TILLDataParser::V2SingleFippsEventToFragment(uint32_t* data)
       return 1;
    }
    // Good event
-   eventFrag->SetCharge(static_cast<int32_t>(Charge) );
+   eventFrag->SetCharge(static_cast<int32_t>(Charge));
    if(fRecordDiag) {
       TParsingDiagnostics::Get()->GoodFragment(eventFrag);
    }
