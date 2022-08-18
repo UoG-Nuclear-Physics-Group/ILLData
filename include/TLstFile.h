@@ -49,14 +49,21 @@ public:
    int GetRunNumber() override;
    int GetSubRunNumber() override;
 
+   int32_t Version() { return fVersion; }
+   int32_t TimeBase() { return fTimeBase; }
+   int32_t NbEvents() { return fNbEvents; }
+   int32_t NbBoards() { return fNbBoards; }
+   int32_t* BoardHeaders() { return fBoardHeaders; }
 #ifndef __CINT__
    std::shared_ptr<TRawEvent> NewEvent() override { return std::make_shared<TLstEvent>(); }
 #endif
 private:
+	void ParseHeaders();
+
    int32_t fVersion;
    int32_t fTimeBase;
-   int32_t fnbEvents;
-   int32_t fnbBoards;
+   int32_t fNbEvents;
+   int32_t fNbBoards;
    int32_t* fBoardHeaders;
    std::ifstream fInputStream;
 

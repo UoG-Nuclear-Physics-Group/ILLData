@@ -101,25 +101,27 @@ bool TLstFile::Open(const char* filename)
       
       fInputStream.read(reinterpret_cast<char *>(&fVersion), sizeof(int32_t));
       fInputStream.read(reinterpret_cast<char *>(&fTimeBase), sizeof(int32_t));
-      fInputStream.read(reinterpret_cast<char *>(&fnbEvents), sizeof(int32_t));
-      fInputStream.read(reinterpret_cast<char *>(&fnbBoards), sizeof(int32_t));
+      fInputStream.read(reinterpret_cast<char *>(&fNbEvents), sizeof(int32_t));
+      fInputStream.read(reinterpret_cast<char *>(&fNbBoards), sizeof(int32_t));
       headerSize += 4*4; // 4 chucks of 4 Bytes
 
       // Read Board Headers
-      fBoardHeaders = new int32_t[fnbBoards];
-      fInputStream.read(reinterpret_cast<char *>(fBoardHeaders), fnbBoards * sizeof(uint32_t));
-      headerSize += 4*fnbBoards;
+      fBoardHeaders = new int32_t[fNbBoards];
+      fInputStream.read(reinterpret_cast<char *>(fBoardHeaders), fNbBoards * sizeof(uint32_t));
+      headerSize += 4*fNbBoards;
 
       fReadBuffer.reserve(READ_EVENT_SIZE*4*sizeof(int32_t));
       fReadBuffer.resize(READ_EVENT_SIZE*4*sizeof(int32_t));
       fInputStream.seekg(headerSize, std::ifstream::beg);
-
    } catch(std::exception& e) {
       std::cout<<"Caught "<<e.what() << " at " << __FILE__ << " : "  << __LINE__ <<std::endl;
    }
 
 	// setup TChannel to use our mnemonics
 	TChannel::SetMnemonicClass(TILLMnemonic::Class());
+
+	// parse header information
+	ParseHeaders();
 
    TRunInfo::SetRunInfo(GetRunNumber(), GetSubRunNumber());
    TRunInfo::SetRunLength(300); 
@@ -134,6 +136,57 @@ bool TLstFile::Open(const char* filename)
    return true;
 }
 
+void TLstFile::ParseHeaders()
+{
+	// loop over all board headers
+	for(uint8_t board = 0; board < fNbBoards; ++board) {
+		// get the board information
+		uint8_t crate = (fBoardHeaders[board] >> 12) & 0xf;
+		uint16_t eventType = (fBoardHeaders[board] >> 16) & 0xffff; // not used except for printing
+		uint8_t nbChannels = (fBoardHeaders[board] >> 6) & 0x3f;
+		uint8_t boardType = fBoardHeaders[board] & 0x3f;
+		std::string boardName = "unset";
+		switch(boardType) {
+			// only V1724, V1725, V1730, and V1751 are implemented
+			// the case IDs are taken from CrateBoard.h from the ILL (assuming no difference between PHA, PSD, and waveform types)
+			case 2:
+			case 32:
+				boardName = "V1724";
+				break;
+			case 7:
+			case 34:
+				boardName = "V1725";
+				break;
+			case 3:
+			case 4:
+			case 33:
+				boardName = "V1730";
+				break;
+			case 1:
+			case 31:
+				boardName = "V1751";
+				break;
+			default:
+				std::cout<<"Warning, unknown board type "<<boardType<<" encountered, don't know what digitizer type is."<<std::endl;
+				break;
+		}
+		std::cout<<"For "<<static_cast<int>(board)<<". board got header "<<hex(fBoardHeaders[board], 8)<<": crate "<<static_cast<int>(crate)<<", event type "<<eventType<<", board type "<<static_cast<int>(boardType)<<" = "<<boardName<<" with "<<static_cast<int>(nbChannels)<<" channels."<<std::endl;
+		for(uint8_t channel = 0; channel < nbChannels; ++channel) {
+			// channel address is 4 bit crate, 6 bit board, 6 bit channel
+			unsigned int address = (static_cast<unsigned int>(crate)<<12) | (static_cast<unsigned int>(board)<<6) | channel;
+
+			TChannel* tmpChan = TChannel::GetChannel(address);
+			if(tmpChan == nullptr) {
+				// ignoring crate here, so if Fipps ever changes to multiple crates this needs to be updated
+				tmpChan = new TChannel(Form("TMP%02dXX%02dX", board, channel));
+				tmpChan->SetAddress(address);
+			}
+			tmpChan->SetDigitizerType(TPriorityValue<std::string>(boardName, EPriority::kInputFile));
+			TChannel::AddChannel(tmpChan);
+		}
+	}
+}
+
 void TLstFile::Close()
 {
    fInputStream.close();
@@ -141,8 +194,6 @@ void TLstFile::Close()
 
 /// \param [in] Event Pointer to an empty TLstEvent
 /// \returns "true" for success, "false" for failure, see GetLastError() to see why
-///
-///  EDITED FROM THE ORIGINAL TO RETURN TOTAL SUCESSFULLY BYTES READ INSTEAD OF TRUE/FALSE,  PCB
 ///
 int TLstFile::Read(std::shared_ptr<TRawEvent> Event)
 {
@@ -154,7 +205,6 @@ int TLstFile::Read(std::shared_ptr<TRawEvent> Event)
    LstEvent->Clear();
 
    LstEvent->SetLstVersion(fVersion);
-
 
    if(fBytesRead < fFileSize) {
       // Fill the buffer
