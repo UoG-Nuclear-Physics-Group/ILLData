@@ -14,6 +14,8 @@
 #include "TFragment.h"
 #include "TBadFragment.h"
 
+#include "TILLMnemonic.h"
+
 TILLDataParser::TILLDataParser()
    : TDataParser()
 {
@@ -70,67 +72,73 @@ int TILLDataParser::V1SingleFippsEventToFragment(uint32_t* data)
    tmpTimestamp = data[0] & 0xffff;
 
    // Concatenate timestamp informatioan based on board type
-   switch(static_cast<EDigitizer>((data[0] >> 22) & 0x3f)) {
-      case EDigitizer::kV1724: 
-         tmpTimestamp = tmpTimestamp<<30;
-         tmpTimestamp |= data[1] & 0x3fffffff; // 30 bit timestamp
-			break;
-		case EDigitizer::kV1725_PHA: // also for 1730_PSD according to Event.h from ILL
-         tmpTimestamp = tmpTimestamp<<31;
-         tmpTimestamp |= data[1] & 0x7fffffff; // 31 bit timestamp
-			break;
-      default:
-         tmpTimestamp = tmpTimestamp<<32;
-         tmpTimestamp |= data[1] & 0xffffffff; // 32 bit timestamp
-			break;
-   }
-   eventFrag->SetTimeStamp(tmpTimestamp);
+	if(eventFrag->GetChannel() != nullptr) {
+		switch(eventFrag->GetChannel()->GetDigitizerType()) {
+			case EDigitizer::kV1724: 
+				tmpTimestamp = tmpTimestamp<<30;
+				tmpTimestamp |= data[1] & 0x3fffffff; // 30 bit timestamp
+				break;
+			case EDigitizer::kV1725:
+				tmpTimestamp = tmpTimestamp<<31;
+				tmpTimestamp |= data[1] & 0x7fffffff; // 31 bit timestamp
+				break;
+			default:
+				tmpTimestamp = tmpTimestamp<<32;
+				tmpTimestamp |= data[1] & 0xffffffff; // 32 bit timestamp
+				break;
+		}
+	} else {
+		std::cerr<<DRED<<"Failed to find channel for address "<<hex(eventFrag->GetAddress(),4)<<" using default 32bit timestamp format, times might be wrong for this channel!"<<std::endl;
+		tmpTimestamp = tmpTimestamp<<32;
+		tmpTimestamp |= data[1] & 0xffffffff; // 32 bit timestamp
+	}
+	eventFrag->SetTimeStamp(tmpTimestamp);
 
-   int32_t Charge = (data[2] & 0x7fff);
-   // Discriminate bad fragments
-   if(Charge == 0 || Charge == 0x8000) {
-      if(fRecordDiag) {
-         TParsingDiagnostics::Get()->BadFragment(99);
-      }
-      Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
-      return 1;
-   }
-   // Good event
-   eventFrag->SetCharge(static_cast<int32_t>(Charge));
-   if(fRecordDiag) {
-      TParsingDiagnostics::Get()->GoodFragment(eventFrag);
-   }
-   Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
-   return 1;
+	int32_t Charge = (data[2] & 0x7fff);
+	// Discriminate bad fragments
+	if(Charge == 0 || Charge == 0x8000) {
+		if(fRecordDiag) {
+			TParsingDiagnostics::Get()->BadFragment(99);
+		}
+		Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
+		return 1;
+	}
+	// Good event
+	eventFrag->SetCharge(static_cast<int32_t>(Charge));
+	if(fRecordDiag) {
+		TParsingDiagnostics::Get()->GoodFragment(eventFrag);
+	}
+	Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
+	return 1;
 }
 
 int TILLDataParser::V2SingleFippsEventToFragment(uint32_t* data)
 {
-   std::shared_ptr<TFragment> eventFrag       = std::make_shared<TFragment>();
-   Long64_t                   tmpTimestamp;
+	std::shared_ptr<TFragment> eventFrag       = std::make_shared<TFragment>();
+	Long64_t                   tmpTimestamp;
 
-   eventFrag->SetAddress((data[0] >> 16) & 0xffff);
+	eventFrag->SetAddress((data[0] >> 16) & 0xffff);
 
-   // Rollover, constant beween boards
-   tmpTimestamp = data[0] & 0xffff;
-   tmpTimestamp = tmpTimestamp<<32;
-   tmpTimestamp |= data[1] & 0xffffffff; // 32 bit timestamp
-   eventFrag->SetTimeStamp(tmpTimestamp);
+	// Rollover, constant beween boards
+	tmpTimestamp = data[0] & 0xffff;
+	tmpTimestamp = tmpTimestamp<<32;
+	tmpTimestamp |= data[1] & 0xffffffff; // 32 bit timestamp
+	eventFrag->SetTimeStamp(tmpTimestamp);
 
-   int32_t Charge = (data[2] & 0x7fff);
-   // Discriminate bad fragments
-   if(Charge == 0 || Charge == 0x8000) {
-      if(fRecordDiag) {
-         TParsingDiagnostics::Get()->BadFragment(99);
-      }
-      Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
-      return 1;
-   }
-   // Good event
-   eventFrag->SetCharge(static_cast<int32_t>(Charge));
-   if(fRecordDiag) {
-      TParsingDiagnostics::Get()->GoodFragment(eventFrag);
-   }
-   Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
-   return 1;
+	int32_t Charge = (data[2] & 0x7fff);
+	// Discriminate bad fragments
+	if(Charge == 0 || Charge == 0x8000) {
+		if(fRecordDiag) {
+			TParsingDiagnostics::Get()->BadFragment(99);
+		}
+		Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
+		return 1;
+	}
+	// Good event
+	eventFrag->SetCharge(static_cast<int32_t>(Charge));
+	if(fRecordDiag) {
+		TParsingDiagnostics::Get()->GoodFragment(eventFrag);
+	}
+	Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
+	return 1;
 }

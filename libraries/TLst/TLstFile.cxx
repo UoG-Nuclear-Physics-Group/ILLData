@@ -142,9 +142,35 @@ void TLstFile::ParseHeaders()
 	for(uint8_t board = 0; board < fNbBoards; ++board) {
 		// get the board information
 		uint8_t crate = (fBoardHeaders[board] >> 12) & 0xf;
-		//uint16_t eventType = (fBoardHeaders[board] >> 16) & 0xffff; // not used at all??? 
+		uint16_t eventType = (fBoardHeaders[board] >> 16) & 0xffff; // not used except for printing
 		uint8_t nbChannels = (fBoardHeaders[board] >> 6) & 0x3f;
 		uint8_t boardType = fBoardHeaders[board] & 0x3f;
+		std::string boardName = "unset";
+		switch(boardType) {
+			// only V1724, V1725, V1730, and V1751 are implemented
+			// the case IDs are taken from CrateBoard.h from the ILL (assuming no difference between PHA, PSD, and waveform types)
+			case 2:
+			case 32:
+				boardName = "V1724";
+				break;
+			case 7:
+			case 34:
+				boardName = "V1725";
+				break;
+			case 3:
+			case 4:
+			case 33:
+				boardName = "V1730";
+				break;
+			case 1:
+			case 31:
+				boardName = "V1751";
+				break;
+			default:
+				std::cout<<"Warning, unknown board type "<<boardType<<" encountered, don't know what digitizer type is."<<std::endl;
+				break;
+		}
+		std::cout<<"For "<<static_cast<int>(board)<<". board got header "<<hex(fBoardHeaders[board], 8)<<": crate "<<static_cast<int>(crate)<<", event type "<<eventType<<", board type "<<static_cast<int>(boardType)<<" = "<<boardName<<" with "<<static_cast<int>(nbChannels)<<" channels."<<std::endl;
 		for(uint8_t channel = 0; channel < nbChannels; ++channel) {
 			// channel address is 4 bit crate, 6 bit board, 6 bit channel
 			unsigned int address = (static_cast<unsigned int>(crate)<<12) | (static_cast<unsigned int>(board)<<6) | channel;
@@ -155,30 +181,7 @@ void TLstFile::ParseHeaders()
 				tmpChan = new TChannel(Form("TMP%02dXX%02dX", board, channel));
 				tmpChan->SetAddress(address);
 			}
-			switch(boardType) {
-				// only V1724, V1725, V1730, and V1751 are implemented
-				// the case IDs are taken from CrateBoard.h from the ILL (assuming no difference between PHA, PSD, and waveform types)
-				case 2:
-				case 32:
-					tmpChan->SetDigitizerType(TPriorityValue<std::string>("V1724", EPriority::kInputFile));
-					break;
-				case 7:
-				case 34:
-					tmpChan->SetDigitizerType(TPriorityValue<std::string>("V1725", EPriority::kInputFile));
-					break;
-				case 3:
-				case 4:
-				case 33:
-					tmpChan->SetDigitizerType(TPriorityValue<std::string>("V1730", EPriority::kInputFile));
-					break;
-				case 1:
-				case 31:
-					tmpChan->SetDigitizerType(TPriorityValue<std::string>("V1730", EPriority::kInputFile));
-					break;
-				default:
-					std::cout<<"Warning, unknown board type "<<boardType<<" encountered, don't know what digitizer type address 0x"<<hex(address, 4)<<" is."<<std::endl;
-					break;
-			}
+			tmpChan->SetDigitizerType(TPriorityValue<std::string>(boardName, EPriority::kInputFile));
 			TChannel::AddChannel(tmpChan);
 		}
 	}
