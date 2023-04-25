@@ -133,9 +133,9 @@ TFipps::~TFipps()
    // Default Destructor
 
    // fHits automatically deleted in TDetector
-   for( auto hit : fAddbackHits ) delete hit;
-   for( auto hit : fSuppressedHits ) delete hit;
-   for( auto hit : fSuppressedAddbackHits ) delete hit;
+   for(auto hit : fAddbackHits) delete hit;
+   for(auto hit : fSuppressedHits) delete hit;
+   for(auto hit : fSuppressedAddbackHits) delete hit;
 
 }
 
@@ -145,10 +145,9 @@ void TFipps::Clear(Option_t* opt)
    ClearStatus();
    TSuppressed::Clear(opt);
 
-
-   for( auto hit : fAddbackHits ) delete hit;
-   for( auto hit : fSuppressedHits ) delete hit;
-   for( auto hit : fSuppressedAddbackHits ) delete hit;
+   for(auto hit : fAddbackHits) delete hit;
+   for(auto hit : fSuppressedHits) delete hit;
+   for(auto hit : fSuppressedAddbackHits) delete hit;
 
    fAddbackHits.clear();
    fSuppressedHits.clear();
@@ -296,6 +295,9 @@ Int_t TFipps::GetSuppressedMultiplicity(const TBgo* bgo)
 	}
    // if the suppressed has been reset, clear the suppressed hits
    if(!IsSuppressed()) {
+		for(auto hit : sup_vec) {
+         delete hit;
+      }
       sup_vec.clear();
    }
    if(sup_vec.empty()) {
@@ -305,7 +307,6 @@ Int_t TFipps::GetSuppressedMultiplicity(const TBgo* bgo)
 
    return sup_vec.size();
 }
-    
 
 Int_t TFipps::GetAddbackMultiplicity()
 {
@@ -324,6 +325,9 @@ Int_t TFipps::GetAddbackMultiplicity()
 
    // if the addback has been reset, clear the addback hits
    if(!IsAddbackSet()) {
+		for(auto hit : ab_vec) {
+         delete hit;
+      }
       ab_vec.clear();
       frag_vec.clear();
    }
@@ -352,12 +356,15 @@ Int_t TFipps::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
 
    // if the addback has been reset, clear the addback hits
    if(!IsAddbackSet()) {
+		for(auto hit : ab_vec) {
+         delete hit;
+      }
       ab_vec.clear();
       frag_vec.clear();
    }
    if(ab_vec.empty()) {
 		CreateSuppressedAddback(bgo, hit_vec, ab_vec, frag_vec);
-        SetSuppressedAddback(true);
+		SetSuppressedAddback(true);
    }
 
    return ab_vec.size();
@@ -464,6 +471,9 @@ void TFipps::ResetAddback()
 {
    SetAddback(false);
    SetCrossTalk(false);
+	for(auto hit : GetAddbackVector()) {
+      delete hit;
+   }
    GetAddbackVector().clear();
    GetAddbackFragVector().clear();
 }
@@ -471,6 +481,9 @@ void TFipps::ResetAddback()
 void TFipps::ResetSuppressed()
 {
     SetSuppressed(false);
+	 for(auto hit : GetSuppressedVector()) {
+      delete hit;
+   }
     GetSuppressedVector().clear();
 }
 
@@ -479,6 +492,10 @@ void TFipps::ResetSuppressedAddback()
    SetAddback(false);
    SetCrossTalk(false);
    SetSuppressed(false);
+   SetSuppressedAddback(false);
+	for(auto hit : GetSuppressedAddbackVector()) {
+      delete hit;
+   }
    GetSuppressedAddbackVector().clear();
    GetSuppressedAddbackFragVector().clear();
 }

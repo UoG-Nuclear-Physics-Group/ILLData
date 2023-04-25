@@ -105,10 +105,10 @@ private:
    mutable TTransientBits<UChar_t> fFippsBits; // Transient member flags
 
    mutable std::vector<TDetectorHit*> fAddbackHits;  //!<! Used to create addback hits on the fly
-   mutable std::vector<UShort_t>  fAddbackFrags; //!<! Number of crystals involved in creating in the addback hit
-   mutable std::vector<TDetectorHit*> fSuppressedHits;
-   mutable std::vector<TDetectorHit*> fSuppressedAddbackHits;
-   mutable std::vector<UShort_t> fSuppressedAddbackFrags;
+   mutable std::vector<UShort_t>  fAddbackFrags; //!<! Number of crystals involved in creating the addback hit
+   mutable std::vector<TDetectorHit*> fSuppressedHits; //!<! Used to create suppressed hits on the fly
+   mutable std::vector<TDetectorHit*> fSuppressedAddbackHits; //!<! Used to create suppressed addback hits on the fly
+   mutable std::vector<UShort_t> fSuppressedAddbackFrags; //!<! Number of crystals involved in creating the suppressed addback hit
 
 public:
    // static bool SetBGOHits()       { return fSetBGOHits;   }  //!<!
