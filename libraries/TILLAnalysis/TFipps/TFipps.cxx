@@ -347,7 +347,7 @@ Int_t TFipps::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
    if(!IsCrossTalkSet()) {
       FixCrossTalk();
    }
-   auto& hit_vec  = GetSuppressedVector();
+   auto& hit_vec  = GetHitVector();
    auto& ab_vec   = GetSuppressedAddbackVector();
    auto& frag_vec = GetSuppressedAddbackFragVector();
    if(hit_vec.empty()) {
@@ -355,7 +355,7 @@ Int_t TFipps::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
    }
 
    // if the addback has been reset, clear the addback hits
-   if(!IsAddbackSet()) {
+   if(!IsSuppressedAddbackSet()) {
 		for(auto hit : ab_vec) {
          delete hit;
       }
