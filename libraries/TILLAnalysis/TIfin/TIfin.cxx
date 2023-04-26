@@ -132,6 +132,10 @@ void TIfin::Copy(TObject& rhs) const
    // Copy function.
    TSuppressed::Copy(rhs);
 
+   for(auto& hit : static_cast<TIfin&>(rhs).fAddbackHits) delete hit;
+   for(auto& hit : static_cast<TIfin&>(rhs).fSuppressedHits) delete hit;
+   for(auto& hit : static_cast<TIfin&>(rhs).fSuppressedAddbackHits) delete hit;
+
    static_cast<TIfin&>(rhs).fAddbackHits.clear();
    static_cast<TIfin&>(rhs).fAddbackFrags.clear();
    static_cast<TIfin&>(rhs).fSuppressedHits.clear();
@@ -145,9 +149,9 @@ TIfin::~TIfin()
    // Default Destructor
 
    // fHits automatically deleted in TDetector
-   for( auto hit : fAddbackHits ) delete hit;
-   for( auto hit : fSuppressedHits ) delete hit;
-   for( auto hit : fSuppressedAddbackHits ) delete hit;
+   for(auto& hit : fAddbackHits) delete hit;
+   for(auto& hit : fSuppressedHits) delete hit;
+   for(auto& hit : fSuppressedAddbackHits) delete hit;
 
 }
 
@@ -157,10 +161,9 @@ void TIfin::Clear(Option_t* opt)
    ClearStatus();
    TSuppressed::Clear(opt);
 
-
-   for( auto hit : fAddbackHits ) delete hit;
-   for( auto hit : fSuppressedHits ) delete hit;
-   for( auto hit : fSuppressedAddbackHits ) delete hit;
+   for(auto& hit : fAddbackHits) delete hit;
+   for(auto& hit : fSuppressedHits) delete hit;
+   for(auto& hit : fSuppressedAddbackHits) delete hit;
 
    fAddbackHits.clear();
    fSuppressedHits.clear();
@@ -308,6 +311,9 @@ Int_t TIfin::GetSuppressedMultiplicity(const TBgo* bgo)
 	}
    // if the suppressed has been reset, clear the suppressed hits
    if(!IsSuppressed()) {
+		for(auto& hit : sup_vec) {
+			delete hit;
+		}
       sup_vec.clear();
    }
    if(sup_vec.empty()) {
@@ -336,6 +342,9 @@ Int_t TIfin::GetAddbackMultiplicity()
 
    // if the addback has been reset, clear the addback hits
    if(!IsAddbackSet()) {
+		for(auto& hit : ab_vec) {
+			delete hit;
+		}
       ab_vec.clear();
       frag_vec.clear();
    }
@@ -355,7 +364,7 @@ Int_t TIfin::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
    if(!IsCrossTalkSet()) {
       FixCrossTalk();
    }
-   auto& hit_vec  = GetSuppressedVector();
+   auto& hit_vec  = GetHitVector();
    auto& ab_vec   = GetSuppressedAddbackVector();
    auto& frag_vec = GetSuppressedAddbackFragVector();
    if(hit_vec.empty()) {
@@ -364,6 +373,9 @@ Int_t TIfin::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
 
    // if the addback has been reset, clear the addback hits
    if(!IsAddbackSet()) {
+		for(auto& hit : ab_vec) {
+			delete hit;
+		}
       ab_vec.clear();
       frag_vec.clear();
    }
@@ -476,14 +488,20 @@ void TIfin::ResetAddback()
 {
    SetAddback(false);
    SetCrossTalk(false);
+	for(auto& hit : GetAddbackVector()) {
+		delete hit;
+	}
    GetAddbackVector().clear();
    GetAddbackFragVector().clear();
 }
 
 void TIfin::ResetSuppressed()
 {
-    SetSuppressed(false);
-    GetSuppressedVector().clear();
+	SetSuppressed(false);
+	for(auto& hit : GetSuppressedVector()) {
+		delete hit;
+	}
+	GetSuppressedVector().clear();
 }
 
 void TIfin::ResetSuppressedAddback()
@@ -491,6 +509,9 @@ void TIfin::ResetSuppressedAddback()
    SetAddback(false);
    SetCrossTalk(false);
    SetSuppressed(false);
+	for(auto& hit : GetSuppressedAddbackVector()) {
+		delete hit;
+	}
    GetSuppressedAddbackVector().clear();
    GetSuppressedAddbackFragVector().clear();
 }
