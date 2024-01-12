@@ -372,7 +372,7 @@ Int_t TIfin::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
    }
 
    // if the addback has been reset, clear the addback hits
-   if(!IsAddbackSet()) {
+   if(!IsSuppressedAddbackSet()) {
 		for(auto& hit : ab_vec) {
 			delete hit;
 		}
