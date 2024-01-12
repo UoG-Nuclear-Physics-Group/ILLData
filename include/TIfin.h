@@ -149,7 +149,7 @@ public:
 	void Print(std::ostream& out) const override;
 
    /// \cond CLASSIMP
-   ClassDefOverride(TIfin, 1) // Ifin Physics structure
+   ClassDefOverride(TIfin, 2) // Ifin Physics structure
    /// \endcond
 };
 /*! @} */
