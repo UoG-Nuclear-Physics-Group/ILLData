@@ -492,10 +492,8 @@ void TFipps::ResetSuppressed()
 
 void TFipps::ResetSuppressedAddback()
 {
-   SetAddback(false);
-   SetCrossTalk(false);
-   SetSuppressed(false);
    SetSuppressedAddback(false);
+   SetCrossTalk(false);
 	for(auto& hit : GetSuppressedAddbackVector()) {
       delete hit;
    }
