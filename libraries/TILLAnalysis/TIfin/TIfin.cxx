@@ -506,9 +506,8 @@ void TIfin::ResetSuppressed()
 
 void TIfin::ResetSuppressedAddback()
 {
-   SetAddback(false);
+   SetSuppressedAddback(false);
    SetCrossTalk(false);
-   SetSuppressed(false);
 	for(auto& hit : GetSuppressedAddbackVector()) {
 		delete hit;
 	}
