@@ -112,10 +112,13 @@ root_generate_dictionary(G__TFippsPulser TFippsPulser.h MODULE TFippsPulser LINK
 
 ##----------------------------------------------------------------------------
 # add the global library with the functions to create files and parsers
+set(ILLDATA_LIBRARIES TLst TILLFormat TILLDataParser TFipps TFippsLaBr TFippsTAC TFippsPulser)
+
 add_library(ILLData SHARED
 	${PROJECT_SOURCE_DIR}/src/ILLDataLibrary.cxx
 	)
 target_link_libraries(ILLData ${ILLDATA_LIBRARIES})
+add_dependencies(ILLData ILLDataVersion)
 
 ##----------------------------------------------------------------------------
 # custom target to generate the version header
