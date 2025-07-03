@@ -4,14 +4,9 @@
 
 #include "GValue.h"
 
-/// \cond CLASSIMP
-ClassImp(TFippsBgoHit)
-/// \endcond
-
 TFippsBgoHit::TFippsBgoHit()
 {
-	Clear();
+   Clear();
 }
 
 TFippsBgoHit::~TFippsBgoHit() = default;
-

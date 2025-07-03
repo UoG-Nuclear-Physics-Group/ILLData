@@ -7,14 +7,10 @@
 #include "Globals.h"
 #include "TFippsLaBr.h"
 
-/// \cond CLASSIMP
-ClassImp(TFippsLaBrHit)
-/// \endcond
-
 TFippsLaBrHit::TFippsLaBrHit()
 {
 // Default Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
+#if ROOT_VERSION_CODE < ROOT_VERSION(6, 0, 0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -25,7 +21,7 @@ TFippsLaBrHit::~TFippsLaBrHit() = default;
 TFippsLaBrHit::TFippsLaBrHit(const TFippsLaBrHit& rhs) : TDetectorHit()
 {
 // Copy Constructor
-#if ROOT_VERSION_CODE < ROOT_VERSION(6,0,0)
+#if ROOT_VERSION_CODE < ROOT_VERSION(6, 0, 0)
    Class()->IgnoreTObjectStreamer(kTRUE);
 #endif
    Clear();
@@ -40,7 +36,7 @@ void TFippsLaBrHit::Copy(TObject& rhs) const
 
 void TFippsLaBrHit::Copy(TObject& obj, bool) const
 {
-	Copy(obj);
+   Copy(obj);
 }
 
 TVector3 TFippsLaBrHit::GetPosition(Double_t) const
@@ -67,14 +63,14 @@ void TFippsLaBrHit::Print(Option_t*) const
    /// Detector
    /// Energy
    /// Time
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TFippsLaBrHit::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-	str<<"TAC Detector:   "<<GetDetector()<<std::endl;
-	str<<"TAC hit energy: "<<GetEnergy()<<std::endl;
-	str<<"TAC hit time:   "<<GetTime()<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << "TAC Detector:   " << GetDetector() << std::endl;
+   str << "TAC hit energy: " << GetEnergy() << std::endl;
+   str << "TAC hit time:   " << GetTime() << std::endl;
+   out << str.str();
 }

@@ -29,25 +29,25 @@ public:
 
    /////////////////////////		/////////////////////////////////////
 
-   inline UShort_t GetArrayNumber() const override { return (4 * (GetDetector() - 1) + (GetCrystal() + 1)); } //!<!
-   static bool CompareEnergy(const TIfinHit*, const TIfinHit*); //!<!
-   void        Add(const TDetectorHit*) override;             //!<!
+   inline UShort_t GetArrayNumber() const override { return (4 * (GetDetector() - 1) + (GetCrystal() + 1)); }   //!<!
+   static bool     CompareEnergy(const TIfinHit*, const TIfinHit*);                                             //!<!
+   void            Add(const TDetectorHit*) override;                                                           //!<!
 
 public:
-   void Clear(Option_t* opt = "") override;       //!<!
-   void Print(Option_t* opt = "") const override; //!<!
-	void Print(std::ostream& out) const override;
-   void Copy(TObject&) const override;            //!<!
-   void Copy(TObject&, bool) const override;      //!<!
+   void Clear(Option_t* opt = "") override;         //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;
+   void Copy(TObject&) const override;         //!<!
+   void Copy(TObject&, bool) const override;   //!<!
 
-   TVector3 GetPosition(double dist) const override; //!<!
+   TVector3 GetPosition(double dist) const override;   //!<!
    TVector3 GetPosition() const override;
 
 private:
-   Double_t GetDefaultDistance() const { return 90.; } // Target to detector distance is 90mm (Unless suppressed)
+   Double_t GetDefaultDistance() const { return 90.; }   // Target to detector distance is 90mm (Unless suppressed)
 
    /// \cond CLASSIMP
-   ClassDefOverride(TIfinHit, 1); // Information about a IFIN Hit
+   ClassDefOverride(TIfinHit, 1);   // Information about a IFIN Hit
    /// \endcond
 };
 /*! @} */

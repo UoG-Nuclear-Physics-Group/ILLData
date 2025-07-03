@@ -14,10 +14,10 @@ public:
    TIfinBgo(const TIfinBgo&);
    virtual ~TIfinBgo();
 
-   TIfinBgo& operator=(const TIfinBgo&); //!<!
+   TIfinBgo& operator=(const TIfinBgo&);   //!<!
 
    /// \cond CLASSIMP
-   ClassDef(TIfinBgo, 1) // GriffinBgo Physics structure
+   ClassDef(TIfinBgo, 1)   // GriffinBgo Physics structure
    /// \endcond
 };
 /*! @} */

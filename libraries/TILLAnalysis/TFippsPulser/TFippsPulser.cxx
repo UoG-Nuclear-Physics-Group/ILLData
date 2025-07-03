@@ -6,11 +6,6 @@
 
 #include "TGRSIOptions.h"
 
-/// \cond CLASSIMP
-ClassImp(TFippsPulser)
-/// \endcond
-
-
 TFippsPulser::TFippsPulser()
 {
    Clear();
@@ -31,7 +26,7 @@ TFippsPulser::TFippsPulser(const TFippsPulser& rhs) : TDetector()
 
 void TFippsPulser::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* chan)
 {
-	
+
    /// This function creates TFippsPulserHits for each fragment and stores them in separate front and back vectors
    if(frag == nullptr || chan == nullptr) {
       return;
@@ -43,12 +38,12 @@ void TFippsPulser::AddFragment(const std::shared_ptr<const TFragment>& frag, TCh
 
 void TFippsPulser::Print(Option_t*) const
 {
-	Print(std::cout);
+   Print(std::cout);
 }
 
 void TFippsPulser::Print(std::ostream& out) const
 {
-	std::ostringstream str;
-	str<<__PRETTY_FUNCTION__<<"\tnot yet written."<<std::endl;
-	out<<str.str();
+   std::ostringstream str;
+   str << __PRETTY_FUNCTION__ << "\tnot yet written." << std::endl;
+   out << str.str();
 }

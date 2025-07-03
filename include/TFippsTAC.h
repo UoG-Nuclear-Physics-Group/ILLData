@@ -34,18 +34,19 @@ public:
    TFippsTACHit* GetTACHit(const int& i) const { return static_cast<TFippsTACHit*>(GetHit(i)); }
 
 #ifndef __CINT__
-   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override; //!<!
+   void AddFragment(const std::shared_ptr<const TFragment>&, TChannel*) override;   //!<!
 #endif
-	void BuildHits() override {} // no need to build any hits, everything already done in AddFragment
+   void BuildHits() override
+   {}   // no need to build any hits, everything already done in AddFragment
 
-   TFippsTAC& operator=(const TFippsTAC&); //!<!
+   TFippsTAC& operator=(const TFippsTAC&);   //!<!
 
 public:
-   void Print(Option_t* opt = "") const override; //!<!
-	void Print(std::ostream& out) const override;  //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;    //!<!
 
    /// \cond CLASSIMP
-   ClassDefOverride(TFippsTAC, 1) // TAC Physics structure
+   ClassDefOverride(TFippsTAC, 1)   // TAC Physics structure
    /// \endcond
 };
 /*! @} */

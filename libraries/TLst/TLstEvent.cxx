@@ -6,10 +6,6 @@
 
 #include "TLstEvent.h"
 
-/// \cond CLASSIMP
-ClassImp(TLstEvent)
-/// \endcond
-
 TLstEvent::TLstEvent()
 {
    // Default constructor
@@ -75,14 +71,14 @@ void TLstEvent::Print(const char* option) const
    /// printed out too.
    ///
 
-	std::cout<<"Event start:"<<std::endl;
+   std::cout << "Event start:" << std::endl;
    if(option[0] == 'a') {
       for(size_t i = 0; i < fData.size() / 4; ++i) {
-			std::cout<<hex(((uint32_t*)fData.data())[i],8)<<std::endl;
+         std::cout << hex(((uint32_t*)fData.data())[i], 8) << std::endl;
          if(i % 10 == 9) {
-				std::cout<<std::endl;
+            std::cout << std::endl;
          } else {
-				std::cout<<" ";
+            std::cout << " ";
          }
       }
    }
