@@ -30,7 +30,7 @@
 
 class TLstFile : public TRawFile {
 public:
-   TLstFile(); ///< default constructor
+   TLstFile() = default; ///< default constructor
    TLstFile(const char* filename, TRawFile::EOpenType open_type = TRawFile::EOpenType::kRead);
    ~TLstFile() override; ///< destructor
 

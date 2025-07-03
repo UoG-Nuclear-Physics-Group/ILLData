@@ -71,8 +71,8 @@ Double_t TFippsTACHit::GetTempCorrectedEnergy(TGraph* correction_graph) const {
 	if(channel == nullptr) {
 		return 0.0;
 	}
-	if(fKValue > 0) {
-		return channel->CalibrateENG(TempCorrectedCharge(correction_graph), (int)fKValue);
+	if(GetKValue() > 0) {
+		return channel->CalibrateENG(TempCorrectedCharge(correction_graph), GetKValue());
 	} else if(channel->UseCalFileIntegration()) {
 		return channel->CalibrateENG(TempCorrectedCharge(correction_graph), 0);
 	}

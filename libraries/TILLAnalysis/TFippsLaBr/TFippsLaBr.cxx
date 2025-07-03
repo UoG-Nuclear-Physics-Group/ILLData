@@ -91,7 +91,7 @@ void TFippsLaBr::Print(Option_t*) const
 void TFippsLaBr::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-	str<<fHits.size()<<" fHits"<<std::endl;
+	str<<Hits().size()<<" Hits"<<std::endl;
 	out<<str.str();
 }
 
@@ -115,7 +115,7 @@ void TFippsLaBr::ResetSuppressed()
 Short_t TFippsLaBr::GetSuppressedMultiplicity(const TBgo* bgo)
 {
 	/// Automatically builds the suppressed hits using the fSuppressionCriterion and returns the number of suppressed hits
-	if(fHits.empty()) {
+	if(Hits().empty()) {
 		return 0;
 	}
    // if the suppressed has been reset, clear the suppressed hits
@@ -128,7 +128,7 @@ Short_t TFippsLaBr::GetSuppressedMultiplicity(const TBgo* bgo)
             fSuppressedHits.clear();
        }
        
-       CreateSuppressed(bgo, fHits, fSuppressedHits);
+       CreateSuppressed(bgo, Hits(), fSuppressedHits);
        SetSuppressed(true);
    }
 
@@ -149,5 +149,5 @@ TFippsLaBrHit* TFippsLaBr::GetSuppressedHit(const int& i)
 void TFippsLaBr::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 	TFippsLaBrHit* hit = new TFippsLaBrHit(*frag);                 // Building is controlled in the constructor of the hit
-	fHits.push_back(hit);
+	Hits().push_back(hit);
 }

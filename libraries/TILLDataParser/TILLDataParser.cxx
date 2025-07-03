@@ -37,25 +37,17 @@ int TILLDataParser::Process(std::shared_ptr<TRawEvent> rawEvent)
    uint32_t size = event->GetDataSize();
    uint32_t* EvntData = reinterpret_cast<uint32_t*>(event->GetData());
 
-   if(fInputSize != nullptr) *fInputSize += event->GetDataSize()/16; // 16 bytes per event, number of bytes in 32bits
+   IncrementInputSize(event->GetDataSize()/16); // 16 bytes per event, number of bytes in 32bits
 
-   if(event->GetLstVersion() == 1) {
-      for(size_t i = 0; i + 3 < size/4; i += 4) {
+	for(size_t i = 0; i + 3 < size/4; i += 4) {
+		if(event->GetLstVersion() == 1) {
          EventsProcessed += V1SingleFippsEventToFragment(EvntData + i);
-         if(fItemsPopped != nullptr && fInputSize != nullptr) {
-            ++(*fItemsPopped);
-            --(*fInputSize);
-         }
-      }
-   } else {
-      for(size_t i = 0; i + 3 < size / 4; i += 4) {
+		} else {
          EventsProcessed += V2SingleFippsEventToFragment(EvntData + i);
-         if(fItemsPopped != nullptr && fInputSize != nullptr) {
-            ++(*fItemsPopped);
-            --(*fInputSize);
-         }
-      }
-   }
+		}
+		IncrementItemsPopped();
+		DecrementInputSize();
+	}
 
    return EventsProcessed;
 }
@@ -97,18 +89,18 @@ int TILLDataParser::V1SingleFippsEventToFragment(uint32_t* data)
 	int32_t Charge = (data[2] & 0x7fff);
 	// Discriminate bad fragments
 	if(Charge == 0 || Charge == 0x8000) {
-		if(fRecordDiag) {
+		if(RecordDiag()) {
 			TParsingDiagnostics::Get()->BadFragment(99);
 		}
-		Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
+		Push(*BadOutputQueue(), std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
 		return 1;
 	}
 	// Good event
 	eventFrag->SetCharge(static_cast<int32_t>(Charge));
-	if(fRecordDiag) {
+	if(RecordDiag()) {
 		TParsingDiagnostics::Get()->GoodFragment(eventFrag);
 	}
-	Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
+	Push(GoodOutputQueues(), std::make_shared<TFragment>(*eventFrag));
 	return 1;
 }
 
@@ -128,17 +120,17 @@ int TILLDataParser::V2SingleFippsEventToFragment(uint32_t* data)
 	int32_t Charge = (data[2] & 0x7fff);
 	// Discriminate bad fragments
 	if(Charge == 0 || Charge == 0x8000) {
-		if(fRecordDiag) {
+		if(RecordDiag()) {
 			TParsingDiagnostics::Get()->BadFragment(99);
 		}
-		Push(*fBadOutputQueue, std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
+		Push(*BadOutputQueue(), std::make_shared<TBadFragment>(*eventFrag, data, 4, 2, false));
 		return 1;
 	}
 	// Good event
 	eventFrag->SetCharge(static_cast<int32_t>(Charge));
-	if(fRecordDiag) {
+	if(RecordDiag()) {
 		TParsingDiagnostics::Get()->GoodFragment(eventFrag);
 	}
-	Push(fGoodOutputQueues, std::make_shared<TFragment>(*eventFrag));
+	Push(GoodOutputQueues(), std::make_shared<TFragment>(*eventFrag));
 	return 1;
 }

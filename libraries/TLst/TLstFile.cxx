@@ -25,17 +25,6 @@
 
 #define READ_EVENT_SIZE 10000
 
-/// \cond CLASSIMP
-ClassImp(TLstFile)
-/// \endcond
-
-TLstFile::TLstFile()
-{
-   // Default Constructor
-   fBytesRead = 0;
-   fFileSize  = 0;
-}
-
 TLstFile::TLstFile(const char* filename, TRawFile::EOpenType open_type) : TLstFile()
 {
    switch(open_type) {
@@ -56,7 +45,7 @@ TLstFile::~TLstFile()
 std::string TLstFile::Status(bool)
 {
    return Form(HIDE_CURSOR " Processed event, have processed %.2fMB/%.2f MB              " SHOW_CURSOR "\r",
-               (fBytesRead / 1000000.0), (fFileSize / 1000000.0));
+               (BytesRead() / 1000000.0), (FileSize() / 1000000.0));
 }
 
 /// Open a lst .lst file with given file name.
@@ -82,7 +71,7 @@ std::string TLstFile::Status(bool)
 /// \returns "true" for succes, "false" for error, use GetLastError() to see why
 bool TLstFile::Open(const char* filename)
 {
-   fFilename = filename;
+   Filename(filename);
    int32_t headerSize = 0; // Count the number of bytes in the header
 
    //int32_t* boardHeaders = new int32_t[nbBoards]
@@ -91,10 +80,10 @@ bool TLstFile::Open(const char* filename)
       fInputStream.open(GetFilename(), std::ifstream::in | std::ifstream::binary);
       fInputStream.seekg(0, std::ifstream::end);
       if(fInputStream.tellg() < 0) {
-         std::cout<<R"(Failed to open ")"<<GetFilename()<<"/"<<fFilename<<R"("!)"<<std::endl;
+         std::cout<<R"(Failed to open ")"<<GetFilename()<<"/"<<Filename()<<R"("!)"<<std::endl;
          return false;
       }
-      fFileSize = fInputStream.tellg();
+      FileSize(fInputStream.tellg());
 
       // Read Header Information
       fInputStream.seekg(0, std::ifstream::beg);
@@ -110,8 +99,7 @@ bool TLstFile::Open(const char* filename)
       fInputStream.read(reinterpret_cast<char *>(fBoardHeaders), fNbBoards * sizeof(uint32_t));
       headerSize += 4*fNbBoards;
 
-      fReadBuffer.reserve(READ_EVENT_SIZE*4*sizeof(int32_t));
-      fReadBuffer.resize(READ_EVENT_SIZE*4*sizeof(int32_t));
+      ResizeBuffer(READ_EVENT_SIZE*4*sizeof(int32_t));
       fInputStream.seekg(headerSize, std::ifstream::beg);
    } catch(std::exception& e) {
       std::cout<<"Caught "<<e.what() << " at " << __FILE__ << " : "  << __LINE__ <<std::endl;
@@ -128,7 +116,7 @@ bool TLstFile::Open(const char* filename)
    TRunInfo::ClearVersion();
    TRunInfo::SetVersion(ILLDATA_RELEASE);
 
-   std::cout<<"Successfully read "<<fFileSize - headerSize<<" bytes into buffer!"<<std::endl;
+   std::cout<<"Successfully read "<<FileSize() - headerSize<<" bytes into buffer!"<<std::endl;
 
 	TILLDetectorInformation* detInfo = new TILLDetectorInformation();
 	TRunInfo::SetDetectorInformation(detInfo);
@@ -195,28 +183,28 @@ void TLstFile::Close()
 /// \param [in] Event Pointer to an empty TLstEvent
 /// \returns "true" for success, "false" for failure, see GetLastError() to see why
 ///
-int TLstFile::Read(std::shared_ptr<TRawEvent> Event)
+int TLstFile::Read(std::shared_ptr<TRawEvent> event)
 {
-   if( Event == nullptr )
+   if(event == nullptr )
       return -1;
 
    size_t LastReadSize = 0;
-   std::shared_ptr<TLstEvent> LstEvent = std::static_pointer_cast<TLstEvent>(Event);
+   std::shared_ptr<TLstEvent> LstEvent = std::static_pointer_cast<TLstEvent>(event);
    LstEvent->Clear();
 
    LstEvent->SetLstVersion(fVersion);
 
-   if(fBytesRead < fFileSize) {
+   if(BytesRead() < FileSize()) {
       // Fill the buffer
       char tempBuff[READ_EVENT_SIZE*4*sizeof(int32_t)] ; 
       try {
          fInputStream.read( tempBuff, READ_EVENT_SIZE*4*sizeof(int32_t));
          LastReadSize = static_cast<size_t>(fInputStream.gcount());
-         fBytesRead += LastReadSize;
+         IncrementBytesRead(LastReadSize);
 
-         fReadBuffer.clear();
+         ClearBuffer();
          for(size_t i = 0; i < LastReadSize; i++) {
-            fReadBuffer.push_back(tempBuff[i]);
+            ReadBuffer().push_back(tempBuff[i]);
          }
 
       } catch(std::exception& e) {
@@ -224,7 +212,7 @@ int TLstFile::Read(std::shared_ptr<TRawEvent> Event)
       }
 
       // Write data to event
-      LstEvent->SetData(fReadBuffer);
+      LstEvent->SetData(ReadBuffer());
 
       return LastReadSize;
    }
@@ -241,26 +229,26 @@ int TLstFile::GetRunNumber()
 {
    // Parse the run number from the current TLstFile. This assumes a format of
    // run#####_###.lst or run#####.lst.
-   if(fFilename.length() == 0) {
+   if(Filename().length() == 0) {
       return 0;
    }
-   std::size_t foundslash = fFilename.rfind('/');
-   std::size_t found      = fFilename.rfind(".lst");
+   std::size_t foundslash = Filename().rfind('/');
+   std::size_t found      = Filename().rfind(".lst");
    if(found == std::string::npos) {
       return 0;
    }
-   std::size_t found2 = fFilename.rfind('-');
+   std::size_t found2 = Filename().rfind('-');
    if((found2 < foundslash && foundslash != std::string::npos) || found2 == std::string::npos) {
-      found2 = fFilename.rfind('_');
+      found2 = Filename().rfind('_');
    }
    if(found2 < foundslash && foundslash != std::string::npos) {
       found2 = std::string::npos;
    }
    std::string temp;
-   if(found2 == std::string::npos || fFilename.compare(found2 + 4, 4, ".lst") != 0) {
-      temp = fFilename.substr(found - 5, 5);
+   if(found2 == std::string::npos || Filename().compare(found2 + 4, 4, ".lst") != 0) {
+      temp = Filename().substr(found - 5, 5);
    } else {
-      temp = fFilename.substr(found - 9, 5);
+      temp = Filename().substr(found - 9, 5);
    }
    return atoi(temp.c_str());
 }

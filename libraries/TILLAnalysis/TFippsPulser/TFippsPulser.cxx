@@ -38,7 +38,7 @@ void TFippsPulser::AddFragment(const std::shared_ptr<const TFragment>& frag, TCh
    }
 
    auto hit = new TDetectorHit(*frag);
-   fHits.push_back(hit);
+   Hits().push_back(hit);
 }
 
 void TFippsPulser::Print(Option_t*) const

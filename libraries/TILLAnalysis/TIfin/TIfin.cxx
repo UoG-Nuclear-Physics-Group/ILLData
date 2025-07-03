@@ -271,7 +271,7 @@ TIfinHit* TIfin::GetIfinHit(const int& i)
       if(!IsCrossTalkSet()) {
          FixCrossTalk();
       }
-      return static_cast<TIfinHit*>(fHits.at(i));
+      return static_cast<TIfinHit*>(Hits().at(i));
    } catch(const std::out_of_range& oor) {
       std::cerr<<ClassName()<<" Hits are out of range: "<<oor.what()<<std::endl;
       if(!gInterpreter) {
@@ -433,7 +433,7 @@ void TIfin::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel* 
 		case TMnemonic::EMnemonic::kG: 
 			{
 				auto geHit = new TIfinHit(*frag);
-				fHits.push_back(std::move(geHit));
+				Hits().push_back(std::move(geHit));
 			}
 			break;
 		default:

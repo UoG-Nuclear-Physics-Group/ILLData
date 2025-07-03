@@ -45,12 +45,12 @@ void TFippsTAC::Print(Option_t*) const
 void TFippsTAC::Print(std::ostream& out) const
 {
 	std::ostringstream str;
-	str<<fHits.size()<<" fHits"<<std::endl;
+	str<<Hits().size()<<" Hits"<<std::endl;
 	out<<str.str();
 }
 
 void TFippsTAC::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*)
 {
 	TFippsTACHit* hit = new TFippsTACHit(*frag);
-	fHits.push_back(hit);
+	Hits().push_back(hit);
 }

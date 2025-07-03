@@ -258,7 +258,7 @@ TFippsHit* TFipps::GetFippsHit(const int& i)
       if(!IsCrossTalkSet()) {
          FixCrossTalk();
       }
-      return static_cast<TFippsHit*>(fHits.at(i));
+      return static_cast<TFippsHit*>(Hits().at(i));
    } catch(const std::out_of_range& oor) {
       std::cerr<<ClassName()<<" Hits are out of range: "<<oor.what()<<std::endl;
       if(!gInterpreter) {
@@ -419,7 +419,7 @@ void TFipps::AddFragment(const std::shared_ptr<const TFragment>& frag, TChannel*
 		case TMnemonic::EMnemonic::kG: 
 			{
 				auto hit = new TFippsHit(*frag);
-				fHits.push_back(hit);
+				Hits().push_back(hit);
 			}
 			break;
 		default:

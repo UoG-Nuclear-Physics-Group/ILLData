@@ -22,21 +22,21 @@ void TILLMnemonic::Clear(Option_t*)
 
 void TILLMnemonic::EnumerateSystem()
 {
-   // Enumerating the fSystemString must come after the total mnemonic has been parsed as the details of other parts of
+   // Enumerating the SystemString must come after the total mnemonic has been parsed as the details of other parts of
    // the mnemonic must be known
-   if(fSystemString.compare("FI") == 0) {
+   if(SystemString() == "FI") {
       if(SubSystem() == EMnemonic::kS) {
          fSystem = ESystem::kFippsBgo;
       } else {
           fSystem = ESystem::kFipps;
       }
-   } else if(fSystemString.compare("IF") == 0) {
+   } else if(SystemString() == "IF") {
       if(SubSystem() == EMnemonic::kS) {
          fSystem = ESystem::kIfinBgo;
       } else {
           fSystem = ESystem::kIfin;
       }
-   } else if(fSystemString.compare("LB") == 0) {
+   } else if(SystemString() == "LB") {
        if(SubSystem() == EMnemonic::kS ) {
            fSystem = ESystem::kFippsLaBrBgo;
        } else if(SubSystem() == EMnemonic::kT) {
@@ -44,7 +44,7 @@ void TILLMnemonic::EnumerateSystem()
        } else {
            fSystem = ESystem::kFippsLaBr;
        }
-   } else if(fSystemString.compare("PU") == 0) {
+   } else if(SystemString() == "PU") {
        fSystem = ESystem::kFippsPulser;
    } else {
       fSystem = ESystem::kClear;
@@ -89,35 +89,31 @@ void TILLMnemonic::Parse(std::string* name)
 
 void TILLMnemonic::Print(Option_t*) const
 {
+	std::ostringstream str;
 	std::cout<<"====== ILLMNEMONIC ======"<<std::endl;
-	std::cout<<"fArrayPosition           = "<<fArrayPosition<<std::endl;
-	std::cout<<"fSegment                 = "<<fSegment<<std::endl;
-	std::cout<<"fSystemString            = "<<fSystemString<<std::endl;
-	std::cout<<"fSubSystemString         = "<<fSubSystemString<<std::endl;
-	std::cout<<"fArraySubPositionString  = "<<fArraySubPositionString<<std::endl;
-	std::cout<<"fCollectedChargeString   = "<<fCollectedChargeString<<std::endl;
-	std::cout<<"fOutputSensorString      = "<<fOutputSensorString<<std::endl;
+	TMnemonic::Print(str);
 	std::cout<<"========================="<<std::endl;
+   std::cout << str.str();
 }
 
 TClass* TILLMnemonic::GetClassType() const
 {
-	if(fClassType != nullptr) {
-		return fClassType;
+	if(TMnemonic::GetClassType() != nullptr) {
+		return TMnemonic::GetClassType();
 	}
 
 	switch(System()) {
-		case ESystem::kFipps:        fClassType = TFipps::Class(); break;
-		case ESystem::kFippsBgo:     fClassType = TFippsBgo::Class(); break;
-		case ESystem::kFippsLaBr:    fClassType = TFippsLaBr::Class(); break;
-		case ESystem::kFippsLaBrBgo: fClassType = TFippsLaBrBgo::Class(); break;
-		case ESystem::kFippsTAC:     fClassType = TFippsTAC::Class(); break;
-		case ESystem::kFippsPulser:  fClassType = TFippsPulser::Class(); break;
-		case ESystem::kIfin:         fClassType = TIfin::Class(); break;
-		case ESystem::kIfinBgo:      fClassType = TIfinBgo::Class(); break;
-		default:                     fClassType = nullptr;
+		case ESystem::kFipps:        SetClassType(TFipps::Class()); break;
+		case ESystem::kFippsBgo:     SetClassType(TFippsBgo::Class()); break;
+		case ESystem::kFippsLaBr:    SetClassType(TFippsLaBr::Class()); break;
+		case ESystem::kFippsLaBrBgo: SetClassType(TFippsLaBrBgo::Class()); break;
+		case ESystem::kFippsTAC:     SetClassType(TFippsTAC::Class()); break;
+		case ESystem::kFippsPulser:  SetClassType(TFippsPulser::Class()); break;
+		case ESystem::kIfin:         SetClassType(TIfin::Class()); break;
+		case ESystem::kIfinBgo:      SetClassType(TIfinBgo::Class()); break;
+		default:                     SetClassType(nullptr);
 	};
-	return fClassType;
+	return TMnemonic::GetClassType();
 }
 
 double TILLMnemonic::GetTime(Long64_t timestamp, Float_t, double energy, const TChannel* channel) const
