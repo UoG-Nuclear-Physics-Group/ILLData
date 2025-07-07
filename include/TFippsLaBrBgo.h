@@ -14,10 +14,10 @@ public:
    TFippsLaBrBgo(const TFippsLaBrBgo&);
    virtual ~TFippsLaBrBgo();
 
-   TFippsLaBrBgo& operator=(const TFippsLaBrBgo&); //!<!
+   TFippsLaBrBgo& operator=(const TFippsLaBrBgo&);   //!<!
 
    /// \cond CLASSIMP
-   ClassDef(TFippsLaBrBgo, 1) // LaBrBgo Physics structure
+   ClassDef(TFippsLaBrBgo, 1)   // LaBrBgo Physics structure
    /// \endcond
 };
 /*! @} */

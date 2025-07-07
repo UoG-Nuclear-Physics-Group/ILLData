@@ -14,10 +14,10 @@ public:
    TFippsBgo(const TFippsBgo&);
    virtual ~TFippsBgo();
 
-   TFippsBgo& operator=(const TFippsBgo&); //!<!
+   TFippsBgo& operator=(const TFippsBgo&);   //!<!
 
    /// \cond CLASSIMP
-   ClassDef(TFippsBgo, 1) // GriffinBgo Physics structure
+   ClassDef(TFippsBgo, 1)   // GriffinBgo Physics structure
    /// \endcond
 };
 /*! @} */

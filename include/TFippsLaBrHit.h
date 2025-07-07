@@ -31,20 +31,20 @@ public:
    TFippsLaBrHit(const TFippsLaBrHit&);
    TFippsLaBrHit(const TFragment& frag) : TDetectorHit(frag) {}
 
-   void Clear(Option_t* opt = "") override;       //!<!
-   void Print(Option_t* opt = "") const override; //!<!
-	void Print(std::ostream& out) const override;
-   void Copy(TObject&) const override;            //!<!
-   void Copy(TObject&, bool) const override;      //!<!
+   void Clear(Option_t* opt = "") override;         //!<!
+   void Print(Option_t* opt = "") const override;   //!<!
+   void Print(std::ostream& out) const override;
+   void Copy(TObject&) const override;         //!<!
+   void Copy(TObject&, bool) const override;   //!<!
 
    TVector3 GetPosition(Double_t dist) const override;
    TVector3 GetPosition() const override;
 
 private:
-   Double_t GetDefaultDistance() const { return 0.; } // This needs to be updated
+   Double_t GetDefaultDistance() const { return 0.; }   // This needs to be updated
 
    /// \cond CLASSIMP
-   ClassDefOverride(TFippsLaBrHit, 2) // Stores the information for a LaBrrHit
+   ClassDefOverride(TFippsLaBrHit, 2)   // Stores the information for a LaBrrHit
    /// \endcond
 };
 /*! @} */

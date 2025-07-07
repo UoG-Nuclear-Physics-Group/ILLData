@@ -6,7 +6,11 @@
 #include "Globals.h"
 #include "TClass.h"
 
-enum class EDigitizer : char { kDefault, kV1724, kV1725, kV1730, kV1751 };
+enum class EDigitizer : char { kDefault,
+                               kV1724,
+                               kV1725,
+                               kV1730,
+                               kV1751 };
 
 class TILLMnemonic : public TMnemonic {
 public:
@@ -18,26 +22,26 @@ public:
    // EMnemonic or ESystem has no effect on the clashing of enumerated variable names.
    // These separations exist only to easily see the difference when looking at the code here.
    enum class ESystem {
-      kFipps,           //0
-      kFippsBgo,        //1
-      kFippsLaBr,       //2
-      kFippsLaBrBgo,    //3
-      kFippsTAC,        //4
-      kFippsPulser,     //5
-      kIfin,            //6
-      kIfinBgo,         //7
-      kClear            //8
+      kFipps,          //0
+      kFippsBgo,       //1
+      kFippsLaBr,      //2
+      kFippsLaBrBgo,   //3
+      kFippsTAC,       //4
+      kFippsPulser,    //5
+      kIfin,           //6
+      kIfinBgo,        //7
+      kClear           //8
    };
 
-   ESystem   System() const { return fSystem; }
+   ESystem System() const { return fSystem; }
 
    void Parse(std::string* name) override;
 
    void EnumerateDigitizer(TPriorityValue<std::string>& digitizerName, TPriorityValue<EDigitizer>& digitizerType, TPriorityValue<int>& timeStampUnit) override;
 
-	TClass* GetClassType() const override;
+   TClass* GetClassType() const override;
 
-	double GetTime(Long64_t timestamp, Float_t cfd, double energy, const TChannel* channel) const override;
+   double GetTime(Long64_t timestamp, Float_t cfd, double energy, const TChannel* channel) const override;
 
    void Print(Option_t* opt = "") const override;
    void Clear(Option_t* opt = "") override;

@@ -20,19 +20,15 @@
 //
 ////////////////////////////////////////////////////////////
 
-/// \cond CLASSIMP
-ClassImp(TFippsBgo)
-/// \endcond
-
 TFippsBgo::TFippsBgo() : TBgo()
 {
-	/// Default ctor.
+   /// Default ctor.
    TBgo::Clear();
 }
 
 TFippsBgo::TFippsBgo(const TFippsBgo& rhs) : TBgo()
 {
-	/// Copy ctor.
+   /// Copy ctor.
    rhs.Copy(*this);
 }
 

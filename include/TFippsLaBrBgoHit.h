@@ -29,7 +29,7 @@ public:
    ~TFippsLaBrBgoHit() override;
 
    /////////////////////////		/////////////////////////////////////
-   UShort_t GetArrayNumber() const override { return (3 * (GetDetector() - 1) + GetSegment()); } //!<! the BGO of each detector has three segments
+   UShort_t GetArrayNumber() const override { return (3 * (GetDetector() - 1) + GetSegment()); }   //!<! the BGO of each detector has three segments
 
    /// \cond CLASSIMP
    ClassDefOverride(TFippsLaBrBgoHit, 1)

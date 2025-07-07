@@ -20,19 +20,15 @@
 //
 ////////////////////////////////////////////////////////////
 
-/// \cond CLASSIMP
-ClassImp(TIfinBgo)
-/// \endcond
-
 TIfinBgo::TIfinBgo() : TBgo()
 {
-	/// Default ctor.
+   /// Default ctor.
    TBgo::Clear();
 }
 
 TIfinBgo::TIfinBgo(const TIfinBgo& rhs) : TBgo()
 {
-	/// Copy ctor.
+   /// Copy ctor.
    rhs.Copy(*this);
 }
 
