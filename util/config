@@ -55,7 +55,7 @@ fi
 libdir="${GRSISYS}/ILLData/lib"
 incdir="${GRSISYS}/ILLData/include"
 
-libs="-lTFippsLaBr -lTFippsPulser -lTFipps -lTFippsTAC -lTILLAnalysis -lTILLDataParser -lTILLFormat -lTLst -lTIfin"
+libs="TFippsLaBr TFippsPulser TFipps TFippsTAC TILLAnalysis TILLDataParser TILLFormat TLst TIfin"
 
 if [[ $(root-config --cflags) == *"-std="* ]]
 then
