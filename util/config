@@ -64,11 +64,20 @@ else
 	cflags="-std=c++11 -I$incdir"
 fi
 
-usage="\
-Usage: grsi-config [--version] [--incdir] [--cflags] [--libs] [--help]"
+PrintHelp () {
+      ### Print a helpful message...
+      progname=$(basename "$0")
+      echo "Usage: ${progname} [options]"
+      echo ""
+      echo "  --version       Print the current ILLData Version number."
+      echo "  --incdir        Print header path."
+      echo "  --cflags        Print compiler flags and header path."
+      echo "  --libs          Print libdir + libraries."
+      echo "  --help          Print what you see here."
+}
 
 if test $# -eq 0; then
-  echo "${usage}" 1>&2
+  PrintHelp
   exit 1
 fi
 
@@ -120,31 +129,19 @@ while test $# -gt 0; do
         continue
       fi
       libsout="yes"
-		if [ -d "${libdir}" ] ; then
-			if [ -z "$out" ] ; then
-				out="-L${libdir}"
-			else
-				out="$out -L${libdir}"
-			fi
+		if [ -z "$out" ] ; then
+			out="-L${libdir}"
+		else
+			out="$out -L${libdir}"
 		fi
 		for library in $libs ; do
-			if [ -e "${libdir}/lib${library}.so" ] || [ -e "${libdir}/lib${library}.dylib" ] ; then
-				out="$out -l${library}"
-			fi
+			out="$out -l${library}"
 		done
       ;;
     --help)
-      ### Print a helpful message...
-      progname=$(basename "$0")
-      echo "Usage: ${progname} [options]"
-      echo ""
-      echo "  --version       Print the current GRSI Version number."
-      echo "  --incdir        Print header path."
-      echo "  --cflags        Print compiler flags and header path."
-      echo "  --libs          Print libdir + libraries."
-      echo "  --help          Print what you see here."
-      exit 0
-      ;;
+		 PrintHelp
+		 exit 0
+		 ;;
     *)
       ### Give an error
       echo "Unknown argument \"$1\"!" 1>&2
