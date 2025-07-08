@@ -88,68 +88,72 @@ cflagsout=no
 libsout=no
 
 while test $# -gt 0; do
-  case $1 in
-    --version)
-      ### Output the version number.  If GVersion.h can not be found, give up.
-      if test -r "${incdir}/GVersion.h"; then
-        tmp=$(sed -n 's,.*GRSI_RELEASE *\"\(.*\)\".*,\1,p' < "${incdir}/GVersion.h")
-        out="$out $tmp"
-      else
-        echo "cannot read ${incdir}/GVersion.h"
-        exit 1
-      fi
-      ;;
-    --incdir)
-      if test "$incdirout" = "yes" ; then
-        shift
-        continue
-      fi
-      incdirout="yes"
-		if [ -z "$out" ] ; then
-			out="$incdir"
-		else
-			out="$out $incdir "
-		fi
-      ;;
-    --cflags)
-      if test "$cflagsout" = "yes" ; then
-        shift
-        continue
-      fi
-      cflagsout="yes"
-		if [ -z "$out" ] ; then
-			out="$cflags"
-		else
-			out="$out $cflags "
-		fi
-      ;;
-    --libs)
-      if test "$libsout" = "yes" ; then
-        shift
-        continue
-      fi
-      libsout="yes"
-		if [ -z "$out" ] ; then
-			out="-L${libdir}"
-		else
-			out="$out -L${libdir}"
-		fi
-		for library in $libs ; do
-			out="$out -l${library}"
-		done
-      ;;
-    --help)
-		 PrintHelp
-		 exit 0
-		 ;;
-    *)
-      ### Give an error
-      echo "Unknown argument \"$1\"!" 1>&2
-      echo "$usage" 1>&2
-      exit 1
-      ;;
-   esac
-   shift 
+	case $1 in
+		--version)
+			### Output the version number.  If GVersion.h can not be found, give up.
+			if test -r "${incdir}/GVersion.h"; then
+				tmp=$(sed -n 's,.*GRSI_RELEASE *\"\(.*\)\".*,\1,p' < "${incdir}/GVersion.h")
+				out="$out $tmp"
+			else
+				echo "cannot read ${incdir}/GVersion.h"
+				exit 1
+			fi
+			;;
+		--incdir)
+			if test "$incdirout" = "yes" ; then
+				shift
+				continue
+			fi
+			incdirout="yes"
+			if [ -z "$out" ] ; then
+				out="$incdir"
+			else
+				out="$out $incdir "
+			fi
+			;;
+		--cflags)
+			if test "$cflagsout" = "yes" ; then
+				shift
+				continue
+			fi
+			cflagsout="yes"
+			if [ -z "$out" ] ; then
+				out="$cflags"
+			else
+				out="$out $cflags "
+			fi
+			;;
+		--libs)
+			if test "$libsout" = "yes" ; then
+				shift
+				continue
+			fi
+			libsout="yes"
+			if [ -d "${libdir}" ] ; then
+				if [ -z "$out" ] ; then
+					out="-L${libdir}"
+				else
+					out="$out -L${libdir}"
+				fi
+			fi
+			for library in $libs ; do
+				if [ -e "${libdir}/lib${library}.so" ] || [ -e "${libdir}/lib${library}.dylib" ] ; then
+					out="$out -l${library}"
+				fi
+			done
+			;;
+		--help)
+			PrintHelp
+			exit 0
+			;;
+		*)
+			### Give an error
+			echo "Unknown argument \"$1\"!" 1>&2
+			echo "$usage" 1>&2
+			exit 1
+			;;
+	esac
+	shift 
 done
 
 echo "$out"

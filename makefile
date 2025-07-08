@@ -91,7 +91,7 @@ ifeq ($(PROOF_INSTALLED),yes)
 	LINKFLAGS += -lProof
 endif
 LINKFLAGS += $(shell grsi-config --all-libs)
-LINKFLAGS += $(shell grsi-config --ILLData-libs)
+#LINKFLAGS += $(shell grsi-config --ILLData-libs)
 
 # RCFLAGS are being used for rootcint, don't add it to the LINKFLAGS, that's already taken care of by grsi-config --all-libs
 ifeq ($(MATHMORE_INSTALLED),yes)
@@ -149,7 +149,7 @@ doxygen:
 	$(MAKE) -C $@
 
 $(GRSISYS)/bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) include/ILLDataVersion.h lib/libILLData.so
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS) $(shell grsi-config --ILLData-libs),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib: include/ILLDataVersion.h
 	@mkdir -p $@
