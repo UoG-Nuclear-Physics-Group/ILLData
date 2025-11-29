@@ -299,7 +299,7 @@ Int_t TIfin::GetSuppressedMultiplicity(const TBgo* bgo)
       // Calculate Cross Talk on each hit
       FixCrossTalk();
    }
-   auto& hit_vec = GetHitVector();
+   auto& hit_vec = Hits();
    auto& sup_vec = GetSuppressedVector();
    if(hit_vec.empty()) {
       return 0;
@@ -327,7 +327,7 @@ Int_t TIfin::GetAddbackMultiplicity()
    if(!IsCrossTalkSet()) {
       FixCrossTalk();
    }
-   auto& hit_vec  = GetHitVector();
+   auto& hit_vec  = Hits();
    auto& ab_vec   = GetAddbackVector();
    auto& frag_vec = GetAddbackFragVector();
    if(hit_vec.empty()) {
@@ -358,7 +358,7 @@ Int_t TIfin::GetSuppressedAddbackMultiplicity(const TBgo* bgo)
    if(!IsCrossTalkSet()) {
       FixCrossTalk();
    }
-   auto& hit_vec  = GetHitVector();
+   auto& hit_vec  = Hits();
    auto& ab_vec   = GetSuppressedAddbackVector();
    auto& frag_vec = GetSuppressedAddbackFragVector();
    if(hit_vec.empty()) {
@@ -565,7 +565,7 @@ Double_t TIfin::CTCorrectedEnergy(const TIfinHit* const hit_to_correct, const TI
 
 void TIfin::FixCrossTalk()
 {
-   auto hit_vec = GetHitVector();
+   auto hit_vec = Hits();
    if(hit_vec.size() < 2) {
       SetCrossTalk(true);
       return;
