@@ -78,7 +78,7 @@ add_library(TILLFormat SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLFormat/TILLMnemonic.cxx
 	)
 root_generate_dictionary(G__TILLFormat TILLDetectorInformation.h TILLMnemonic.h MODULE TILLFormat LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLFormat/LinkDef.h)
-target_link_libraries(TILLFormat TFipps TFippsLaBr TFippsTAC TFippsPulser)
+target_link_libraries(TILLFormat TFipps TFippsLaBr TFippsTAC TFippsPulser ${GRSI_LIBRARIES})
 
 add_library(TILLDataParser SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLDataParser/TILLDataParser.cxx
@@ -102,17 +102,20 @@ add_library(TFippsLaBr SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsLaBr/TFippsLaBrBgoHit.cxx
 	)
 root_generate_dictionary(G__TFippsLaBr TFippsLaBr.h TFippsLaBrHit.h TFippsLaBrBgo.h TFippsLaBrBgoHit.h MODULE TFippsLaBr LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsLaBr/LinkDef.h)
+target_link_libraries(TFippsLaBr ${GRSI_LIBRARIES})
 
 add_library(TFippsTAC SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsTAC/TFippsTAC.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsTAC/TFippsTACHit.cxx
 	)
 root_generate_dictionary(G__TFippsTAC TFippsTAC.h TFippsTACHit.h MODULE TFippsTAC LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsTAC/LinkDef.h)
+target_link_libraries(TFippsTAC ${GRSI_LIBRARIES})
 
 add_library(TFippsPulser SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsPulser/TFippsPulser.cxx
 	)
 root_generate_dictionary(G__TFippsPulser TFippsPulser.h MODULE TFippsPulser LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsPulser/LinkDef.h)
+target_link_libraries(TFippsPulser ${GRSI_LIBRARIES})
 
 ##----------------------------------------------------------------------------
 # add the global library with the functions to create files and parsers
@@ -134,4 +137,3 @@ add_custom_target(ILLDataVersion
                     -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
                     -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
   )
-
