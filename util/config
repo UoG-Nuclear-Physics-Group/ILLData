@@ -44,16 +44,15 @@ else
 	exit
 fi
 if [ -d "${GRSISYS}/ILLData/include" ] ; then
-	incdir="${GRSISYS}/ILLData/include"
+    incdir="${GRSISYS}/ILLData/include"
+elif [ -d "${GRSISYS}/_deps/illdata-src/include" ] ; then
+    incdir="${GRSISYS}/_deps/illdata-src/include"
 elif [ -d "${GRSISYS}/include" ] ; then
-	incdir="${GRSISYS}/include"
+    incdir="${GRSISYS}/include"
 else
 	echo "Couldn't find either ${GRSISYS}/ILLData/include or ${GRSISYS}/include directory, not sure what to do"
 	exit
 fi
-
-libdir="${GRSISYS}/ILLData/lib"
-incdir="${GRSISYS}/ILLData/include"
 
 libs="TFippsLaBr TFippsPulser TFipps TFippsTAC TILLAnalysis TILLDataParser TILLFormat TLst TIfin"
 
