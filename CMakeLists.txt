@@ -74,7 +74,7 @@ add_library(TLst SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TLst/TLstFile.cxx
 	)
 root_generate_dictionary(G__TLst TLstEvent.h TLstFile.h MODULE TLst LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TLst/LinkDef.h OPTIONS ${CLING_OPTIONS})
-target_link_libraries(TLst TILLFormat ${ROOT_LIBRARIES})
+target_link_libraries(TLst TILLFormat ${ROOT_LIBRARIES} ${GRSI_LIBRARIES})
 add_dependencies(TLst ILLDataVersion)
 
 add_library(TILLFormat SHARED
@@ -88,7 +88,7 @@ add_library(TILLDataParser SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLDataParser/TILLDataParser.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TILLDataParser/TILLDataParserException.cxx
 	)
-target_link_libraries(TILLDataParser TLst)
+target_link_libraries(TILLDataParser TLst ${GRSI_LIBRARIES})
 
 add_library(TFipps SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFipps/TFipps.cxx
