@@ -128,7 +128,7 @@ set(ILLDATA_LIBRARIES TLst TILLFormat TILLDataParser TFipps TFippsLaBr TFippsTAC
 add_library(ILLData SHARED
 	${PROJECT_SOURCE_DIR}/src/ILLDataLibrary.cxx
 	)
-target_link_libraries(ILLData ${ILLDATA_LIBRARIES})
+target_link_libraries(ILLData ${ILLDATA_LIBRARIES} ${GRSI_LIBRARIES})
 add_dependencies(ILLData ILLDataVersion)
 
 ##----------------------------------------------------------------------------
