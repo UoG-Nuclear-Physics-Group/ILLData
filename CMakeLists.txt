@@ -82,7 +82,7 @@ add_library(TILLFormat SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLFormat/TILLMnemonic.cxx
 	)
 root_generate_dictionary(G__TILLFormat TILLDetectorInformation.h TILLMnemonic.h MODULE TILLFormat LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLFormat/LinkDef.h)
-target_link_libraries(TILLFormat TFipps TFippsLaBr TFippsTAC TFippsPulser ${GRSI_LIBRARIES})
+target_link_libraries(TILLFormat TFipps TFippsLaBr TFippsTAC TFippsPulser TInfn ${GRSI_LIBRARIES})
 
 add_library(TILLDataParser SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLDataParser/TILLDataParser.cxx
@@ -123,7 +123,7 @@ target_link_libraries(TFippsPulser ${GRSI_LIBRARIES})
 
 ##----------------------------------------------------------------------------
 # add the global library with the functions to create files and parsers
-set(ILLDATA_LIBRARIES TLst TILLFormat TILLDataParser TFipps TFippsLaBr TFippsTAC TFippsPulser)
+set(ILLDATA_LIBRARIES TLst TILLFormat TILLDataParser TFipps TFippsLaBr TFippsTAC TFippsPulser TIfin)
 
 add_library(ILLData SHARED
 	${PROJECT_SOURCE_DIR}/src/ILLDataLibrary.cxx
