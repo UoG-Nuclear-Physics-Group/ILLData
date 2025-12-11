@@ -121,6 +121,15 @@ add_library(TFippsPulser SHARED
 root_generate_dictionary(G__TFippsPulser TFippsPulser.h MODULE TFippsPulser LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsPulser/LinkDef.h)
 target_link_libraries(TFippsPulser ${GRSI_LIBRARIES})
 
+add_library(TIfin SHARED
+   ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TIfin/TIfin.cxx
+   ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TIfin/TIfinHit.cxx
+   ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TIfin/TIfinBgo.cxx
+   ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TIfin/TIfinBgoHit.cxx
+	)
+root_generate_dictionary(G__TIfin TIfin.h TIfinHit.h TIfinBgo.h TIfinBgoHit.h MODULE TIfin LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TIfin/LinkDef.h)
+target_link_libraries(TIfin ${GRSI_LIBRARIES})
+
 ##----------------------------------------------------------------------------
 # add the global library with the functions to create files and parsers
 set(ILLDATA_LIBRARIES TLst TILLFormat TILLDataParser TFipps TFippsLaBr TFippsTAC TFippsPulser)
