@@ -74,7 +74,7 @@ add_library(TLst SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TLst/TLstFile.cxx
 	)
 root_generate_dictionary(G__TLst TLstEvent.h TLstFile.h MODULE TLst LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TLst/LinkDef.h OPTIONS ${CLING_OPTIONS})
-target_link_libraries(TLst TILLFormat ${ROOT_LIBRARIES} ${GRSI_LIBRARIES})
+target_link_libraries(TLst PUBLIC TILLFormat ${ROOT_LIBRARIES} ${GRSI_LIBRARIES})
 add_dependencies(TLst ILLDataVersion)
 
 add_library(TILLFormat SHARED
@@ -82,13 +82,13 @@ add_library(TILLFormat SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLFormat/TILLMnemonic.cxx
 	)
 root_generate_dictionary(G__TILLFormat TILLDetectorInformation.h TILLMnemonic.h MODULE TILLFormat LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLFormat/LinkDef.h)
-target_link_libraries(TILLFormat TFipps TFippsLaBr TFippsTAC TFippsPulser TIfin ${GRSI_LIBRARIES})
+target_link_libraries(TILLFormat PUBLIC TFipps TFippsLaBr TFippsTAC TFippsPulser TIfin ${GRSI_LIBRARIES})
 
 add_library(TILLDataParser SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLDataParser/TILLDataParser.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TILLDataParser/TILLDataParserException.cxx
 	)
-target_link_libraries(TILLDataParser TLst ${GRSI_LIBRARIES})
+target_link_libraries(TILLDataParser PUBLIC TLst ${GRSI_LIBRARIES})
 
 add_library(TFipps SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFipps/TFipps.cxx
@@ -97,7 +97,7 @@ add_library(TFipps SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFipps/TFippsBgoHit.cxx
 	)
 root_generate_dictionary(G__TFipps TFipps.h TFippsHit.h TFippsBgo.h TFippsBgoHit.h MODULE TFipps LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFipps/LinkDef.h)
-target_link_libraries(TFipps ${GRSI_LIBRARIES})
+target_link_libraries(TFipps PUBLIC ${GRSI_LIBRARIES})
 
 add_library(TFippsLaBr SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsLaBr/TFippsLaBr.cxx
@@ -106,20 +106,20 @@ add_library(TFippsLaBr SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsLaBr/TFippsLaBrBgoHit.cxx
 	)
 root_generate_dictionary(G__TFippsLaBr TFippsLaBr.h TFippsLaBrHit.h TFippsLaBrBgo.h TFippsLaBrBgoHit.h MODULE TFippsLaBr LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsLaBr/LinkDef.h)
-target_link_libraries(TFippsLaBr ${GRSI_LIBRARIES})
+target_link_libraries(TFippsLaBr PUBLIC ${GRSI_LIBRARIES})
 
 add_library(TFippsTAC SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsTAC/TFippsTAC.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsTAC/TFippsTACHit.cxx
 	)
 root_generate_dictionary(G__TFippsTAC TFippsTAC.h TFippsTACHit.h MODULE TFippsTAC LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsTAC/LinkDef.h)
-target_link_libraries(TFippsTAC ${GRSI_LIBRARIES})
+target_link_libraries(TFippsTAC PUBLIC ${GRSI_LIBRARIES})
 
 add_library(TFippsPulser SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsPulser/TFippsPulser.cxx
 	)
 root_generate_dictionary(G__TFippsPulser TFippsPulser.h MODULE TFippsPulser LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TFippsPulser/LinkDef.h)
-target_link_libraries(TFippsPulser ${GRSI_LIBRARIES})
+target_link_libraries(TFippsPulser PUBLIC ${GRSI_LIBRARIES})
 
 add_library(TIfin SHARED
    ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TIfin/TIfin.cxx
@@ -128,7 +128,7 @@ add_library(TIfin SHARED
    ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TIfin/TIfinBgoHit.cxx
 	)
 root_generate_dictionary(G__TIfin TIfin.h TIfinHit.h TIfinBgo.h TIfinBgoHit.h MODULE TIfin LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TILLAnalysis/TIfin/LinkDef.h)
-target_link_libraries(TIfin ${GRSI_LIBRARIES})
+target_link_libraries(TIfin PUBLIC ${GRSI_LIBRARIES})
 
 ##----------------------------------------------------------------------------
 # add the global library with the functions to create files and parsers
@@ -137,7 +137,7 @@ set(ILLDATA_LIBRARIES TLst TILLFormat TILLDataParser TFipps TFippsLaBr TFippsTAC
 add_library(ILLData SHARED
 	${PROJECT_SOURCE_DIR}/src/ILLDataLibrary.cxx
 	)
-target_link_libraries(ILLData ${ILLDATA_LIBRARIES})
+target_link_libraries(ILLData PUBLIC ${ILLDATA_LIBRARIES})
 add_dependencies(ILLData ILLDataVersion)
 
 ##----------------------------------------------------------------------------
