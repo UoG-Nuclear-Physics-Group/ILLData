@@ -504,6 +504,15 @@ UShort_t TFipps::GetNAddbackFrags(const size_t& idx)
    return 0;
 }
 
+UShort_t TFipps::GetNSuppressedAddbackFrags(const size_t& idx)
+{
+   // Get the number of addback "fragments" contributing to the total suppressed addback hit with index idx.
+   if(idx < GetAddbackFragVector().size()) {
+      return GetAddbackFragVector().at(idx);
+   }
+   return 0;
+}
+
 void TFipps::SetBitNumber(enum EFippsBits bit, Bool_t set) const
 {
    // Used to set the flags that are stored in TFipps.
