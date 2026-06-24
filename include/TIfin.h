@@ -75,12 +75,17 @@ public:
    bool      IsAddbackSet() const;
    void      ResetAddback();
    void      ResetSuppressed();
-   void      ResetSuppressedAddback();
    UShort_t  GetNAddbackFrags(const size_t& idx);
 
    TIfinHit* GetSuppressedHit(const int& i);
    Int_t     GetSuppressedMultiplicity(const TBgo* bgo);
    bool      IsSuppressed() const;
+
+   TIfinHit* GetSuppressedAddbackHit(const int& i);
+   Int_t     GetSuppressedAddbackMultiplicity(const TBgo* bgo);
+   bool      IsSuppressedAddbackSet() const;
+   void      ResetSuppressedAddback();
+   UShort_t  GetNSuppressedAddbackFrags(const size_t& idx);
 
 #if !defined(__CINT__) && !defined(__CLING__)
    void SetSuppressionCriterion(std::function<bool(const TDetectorHit*, const TDetectorHit*)> criterion)
@@ -91,10 +96,6 @@ public:
 
    bool SuppressionCriterion(const TDetectorHit* hit, const TDetectorHit* bgoHit) override { return fSuppressionCriterion(hit, bgoHit); }
 #endif
-
-   TIfinHit* GetSuppressedAddbackHit(const int& i);
-   Int_t     GetSuppressedAddbackMultiplicity(const TBgo* bgo);
-   bool      IsSuppressedAddbackSet() const;
 
 private:
 #if !defined(__CINT__) && !defined(__CLING__)

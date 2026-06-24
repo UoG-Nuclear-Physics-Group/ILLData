@@ -516,6 +516,16 @@ UShort_t TIfin::GetNAddbackFrags(const size_t& idx)
    return 0;
 }
 
+UShort_t TIfin::GetNSuppressedAddbackFrags(const size_t& idx)
+{
+   // Get the number of addback "fragments" contributing to the total addback hit
+   // with index idx.
+   if(idx < GetSuppressedAddbackFragVector().size()) {
+      return GetSuppressedAddbackFragVector().at(idx);
+   }
+   return 0;
+}
+
 void TIfin::SetBitNumber(enum EIfinBits bit, Bool_t set) const
 {
    // Used to set the flags that are stored in TIfin.

@@ -507,8 +507,8 @@ UShort_t TFipps::GetNAddbackFrags(const size_t& idx)
 UShort_t TFipps::GetNSuppressedAddbackFrags(const size_t& idx)
 {
    // Get the number of addback "fragments" contributing to the total suppressed addback hit with index idx.
-   if(idx < GetAddbackFragVector().size()) {
-      return GetAddbackFragVector().at(idx);
+   if(idx < GetSuppressedAddbackFragVector().size()) {
+      return GetSuppressedAddbackFragVector().at(idx);
    }
    return 0;
 }
